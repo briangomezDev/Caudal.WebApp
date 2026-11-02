@@ -1,6 +1,7 @@
 using Caudal.Domain.Security.Adapter;
 using Caudal.Domain.Security.Service;
 using Caudal.Infraestructure.Port.Security;
+using Caudal.Infraestructure.PostgreSQL;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -19,7 +20,7 @@ public class DependencyInjectionTests
             .Build();
 
         return new ServiceCollection()
-            .AddInfrastructure(configuration)
+            .AddPostgreSQL(configuration)
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
     }
 

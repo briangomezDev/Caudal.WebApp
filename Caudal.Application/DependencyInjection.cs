@@ -1,19 +1,20 @@
-﻿using Caudal.Application.Services.AppUser.CreateAccount;
-using Caudal.Infraestructure;
+using Caudal.Application.Services.AppUser.CreateAccount;
 using FluentValidation;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Caudal.Application;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection service, IConfiguration configuration)
+    /// <summary>
+    /// Registra los casos de uso. La infraestructura la registra el proveedor
+    /// de base de datos (por ejemplo AddPostgreSQL) desde el proyecto web.
+    /// </summary>
+    public static IServiceCollection AddApplication(this IServiceCollection service)
     {
-        service.AddInfrastructure(configuration);
         service.AddValidators();
         service.AddScoped<IUserCreateAccountUseCase, UserCreateAccountUseCase>();
-        return service; 
+        return service;
     }
 
     private static IServiceCollection AddValidators(this IServiceCollection services)

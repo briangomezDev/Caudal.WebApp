@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\Caudal.Infraestructure\Caudal.Infraestructure.csproj" />
+    <ProjectReference Include="..\Caudal.Infraestructure.PostgreSQL\Caudal.Infraestructure.PostgreSQL.csproj" />
     <ProjectReference Include="..\Caudal.Domain\Caudal.Domain.csproj" />
     <ProjectReference Include="..\Caudal.Application\Caudal.Application.csproj" />
   </ItemGroup>

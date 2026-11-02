@@ -1,4 +1,5 @@
 using Caudal.Application.Services.AppUser.CreateAccount;
+using Caudal.Infraestructure.PostgreSQL;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +21,8 @@ public class DependencyInjectionTests
             .Build();
         using var services = new ServiceCollection()
             .AddLogging()
-            .AddApplication(configuration)
+            .AddApplication()
+            .AddPostgreSQL(configuration)
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
         using var scope = services.CreateScope();
 

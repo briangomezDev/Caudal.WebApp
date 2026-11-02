@@ -1,5 +1,6 @@
 using Caudal.Domain.Security.Entity;
 using Caudal.Domain.Security.ValueObjects;
+using Caudal.Infraestructure.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -7,6 +8,8 @@ namespace Caudal.Infraestructure.Testing;
 
 public class UnitOfWorkTests
 {
+    private static readonly IDatabaseProvider Provider = new PostgreSQLDatabaseProvider();
+
     // La cadena de conexión nunca se usa: estas pruebas no abren conexión a la base de datos.
     private static CaudalDbContext CreateContext()
     {
@@ -14,7 +17,7 @@ public class UnitOfWorkTests
             .UseNpgsql("Host=unused;Database=unused")
             .Options;
 
-        return new CaudalDbContext(options);
+        return new CaudalDbContext(options, Provider);
     }
 
     // Bueno: el flujo esperado se completa correctamente.
@@ -24,7 +27,7 @@ public class UnitOfWorkTests
     {
         // Arrange
         using var context = CreateContext();
-        var unitOfWork = new UnitOfWork(context);
+        var unitOfWork = new UnitOfWork(context, Provider);
 
         // Act
         var result = await unitOfWork.SaveChangesAsync();
@@ -42,7 +45,21 @@ public class UnitOfWorkTests
         CaudalDbContext context = null!;
 
         // Act
-        var act = () => new UnitOfWork(context);
+        var act = () => new UnitOfWork(context, Provider);
+
+        // Assert
+        Assert.Throws<ArgumentNullException>(act);
+    }
+
+    [Fact]
+    public void Constructor_WithNullProvider_ThrowsException()
+    {
+        // Arrange
+        using var context = CreateContext();
+        IDatabaseProvider provider = null!;
+
+        // Act
+        var act = () => new UnitOfWork(context, provider);
 
         // Assert
         Assert.Throws<ArgumentNullException>(act);
@@ -53,7 +70,7 @@ public class UnitOfWorkTests
     {
         // Arrange
         using var context = CreateContext();
-        var unitOfWork = new UnitOfWork(context);
+        var unitOfWork = new UnitOfWork(context, Provider);
 
         // Act
         var act = () => unitOfWork.CommitTransactionAsync();
@@ -67,7 +84,7 @@ public class UnitOfWorkTests
     {
         // Arrange
         using var context = CreateContext();
-        var unitOfWork = new UnitOfWork(context);
+        var unitOfWork = new UnitOfWork(context, Provider);
 
         // Act
         var act = () => unitOfWork.RollbackTransactionAsync();
@@ -88,7 +105,7 @@ public class UnitOfWorkTests
             "hashed-password",
             new SaltCode("abc123"),
             new DateTime(2026, 1, 15, 10, 30, 0, DateTimeKind.Utc)));
-        var unitOfWork = new UnitOfWork(context);
+        var unitOfWork = new UnitOfWork(context, Provider);
         using var cancellation = new CancellationTokenSource();
         await cancellation.CancelAsync();
 
@@ -106,7 +123,7 @@ public class UnitOfWorkTests
     {
         // Arrange
         var context = CreateContext();
-        var unitOfWork = new UnitOfWork(context);
+        var unitOfWork = new UnitOfWork(context, Provider);
         context.Dispose();
 
         // Act
@@ -121,7 +138,7 @@ public class UnitOfWorkTests
     {
         // Arrange
         var context = CreateContext();
-        var unitOfWork = new UnitOfWork(context);
+        var unitOfWork = new UnitOfWork(context, Provider);
         context.Dispose();
 
         // Act
@@ -136,7 +153,7 @@ public class UnitOfWorkTests
     {
         // Arrange
         var context = CreateContext();
-        var unitOfWork = new UnitOfWork(context);
+        var unitOfWork = new UnitOfWork(context, Provider);
         context.Dispose();
 
         // Act
@@ -151,7 +168,7 @@ public class UnitOfWorkTests
     {
         // Arrange
         var context = CreateContext();
-        var unitOfWork = new UnitOfWork(context);
+        var unitOfWork = new UnitOfWork(context, Provider);
         context.Dispose();
 
         // Act

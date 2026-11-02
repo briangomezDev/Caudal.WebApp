@@ -1,18 +1,23 @@
-﻿using Caudal.Domain.Security.Adapter;
+using Caudal.Domain.Security.Adapter;
 using Caudal.Domain.Security.Service;
 using Caudal.Infraestructure.Port.Security;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Caudal.Infraestructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    /// <summary>
+    /// Registra la infraestructura sin depender de ningún motor.
+    /// La llama el proyecto del proveedor (por ejemplo AddPostgreSQL), que aporta
+    /// la conexión y su implementación de IDatabaseProvider.
+    /// </summary>
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, Action<DbContextOptionsBuilder> configureDatabase)
     {
-        services.AddDbContext<CaudalDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        ArgumentNullException.ThrowIfNull(configureDatabase);
+
+        services.AddDbContext<CaudalDbContext>(configureDatabase);
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<CaudalDbContext>());
 
