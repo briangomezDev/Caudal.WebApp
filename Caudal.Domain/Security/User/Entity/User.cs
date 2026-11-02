@@ -17,6 +17,8 @@ public class User : IAgregateRoot
     public DateTime? EmailVerifiedAt { get; private set; }
     public DateTime? AccountLockedUntil { get; private set; }
 
+    private User() { }
+
     public User(UserId userId, string fullName, Email email, string password, SaltCode saltCode, DateTime accountCreatedAt)
     {
         if(accountCreatedAt.Kind != DateTimeKind.Utc)
