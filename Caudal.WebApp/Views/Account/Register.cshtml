@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Crear cuenta";
+    ViewData["BrandVariant"] = "register";
+    ViewData["BrandTitle"] = "Empieza con una pregunta: ¿a dónde se va mi dinero?";
+    ViewData["BrandLead"] = "En dos minutos tendrás tu primera cuenta, tus categorías y un presupuesto sugerido con la regla 50/30/20.";
+}
+<h2 class="title is-3 mb-1">Crea tu cuenta</h2>
+<p class="subtitle is-6 mb-5">Sin tarjeta de crédito. Sin letra pequeña.</p>
+<form asp-controller="Account" asp-action="Register" method="post">
+    <div class="field">
+        <label class="label" for="reg-name">Nombre</label>
+        <div class="control has-icons-left">
+            <input class="input" id="reg-name" name="FullName" type="text" autocomplete="name" placeholder="¿Cómo te llamamos?" required />
+            <span class="icon is-left"><svg class="ic"><use href="#i-user" /></svg></span>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label" for="reg-email">Correo electrónico</label>
+        <div class="control has-icons-left">
+            <input class="input" id="reg-email" name="Email" type="email" autocomplete="email" placeholder="tu@correo.com" required />
+            <span class="icon is-left"><svg class="ic"><use href="#i-mail" /></svg></span>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label" for="reg-pass">Contraseña</label>
+        <div class="field has-addons mb-0">
+            <div class="control has-icons-left is-expanded">
+                <input class="input" id="reg-pass" name="Password" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" minlength="8" maxlength="128" required aria-describedby="reg-strength-txt" data-strength="reg-strength" data-strength-text="reg-strength-txt" />
+                <span class="icon is-left"><svg class="ic"><use href="#i-lock" /></svg></span>
+            </div>
+            <div class="control"><button type="button" class="button" data-toggle-pass="reg-pass" aria-label="Mostrar contraseña"><svg class="ic"><use href="#i-eye" /></svg></button></div>
+        </div>
+        <div class="strength" id="reg-strength" data-lvl="0"><i></i><i></i><i></i><i></i></div>
+        <p class="help" id="reg-strength-txt" aria-live="polite">Usa 8 o más caracteres, con un número y una mayúscula.</p>
+    </div>
+    <div class="field">
+        <label class="checkbox is-size-7"><input type="checkbox" id="reg-terms" required /> Acepto los <a href="~/terms">términos</a> y la <a href="~/privacy">política de privacidad</a></label>
+    </div>
+    <button class="button is-tertiary is-fullwidth is-medium mt-4" type="submit">Crear cuenta</button>
+</form>
+<p class="has-text-centered is-size-7 mt-4 muted">¿Ya tienes cuenta? <a asp-controller="Account" asp-action="Login" class="has-text-weight-semibold">Inicia sesión</a></p>

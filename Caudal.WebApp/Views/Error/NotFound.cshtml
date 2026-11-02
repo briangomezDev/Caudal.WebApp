@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Página no encontrada";
+}
+<svg class="status-art" viewBox="0 0 320 120" aria-hidden="true">
+    <path class="flow" d="M8 40 C 48 20, 88 60, 128 40 S 188 20, 200 38" />
+    <path class="flow" d="M8 64 C 48 44, 88 84, 128 64 S 188 44, 206 62" />
+    <path class="flow" d="M8 88 C 48 68, 88 108, 128 88 S 188 68, 200 86" />
+    <circle class="drop" cx="222" cy="40" r="3" /><circle class="drop" cx="238" cy="62" r="2.5" /><circle class="drop" cx="226" cy="86" r="2" />
+    <text class="code" x="248" y="76">404</text>
+</svg>
+<p class="eyebrow">Error 404</p>
+<h1 class="title is-3 mt-2 mb-3">No encontramos esta página</h1>
+<p class="status-lead">El enlace puede estar mal escrito o la página ya no existe. Tus cuentas y movimientos siguen donde los dejaste.</p>
+<div class="buttons is-centered mt-5">
+    <a class="button is-primary is-medium" asp-controller="Platform" asp-action="Index"><svg class="ic mr-2"><use href="#i-home" /></svg>Ir al resumen</a>
+    <button class="button is-medium" type="button" data-back="@Url.Action("Index", "Platform")"><svg class="ic mr-2"><use href="#i-left" /></svg>Volver atrás</button>
+</div>
+<div class="status-links">
+    <p class="eyebrow mb-2">¿Buscabas algo de esto?</p>
+    <div class="tags is-centered">
+        <a class="tag is-medium is-secondary-soft" href="~/transactions">Movimientos</a>
+        <a class="tag is-medium is-secondary-soft" href="~/goals">Metas de ahorro</a>
+        <a class="tag is-medium is-secondary-soft" href="~/budgets">Presupuestos</a>
+        <a class="tag is-medium is-secondary-soft" href="~/settings">Ajustes</a>
+    </div>
+</div>

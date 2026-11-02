@@ -21,8 +21,8 @@ public class DependencyInjectionTests
             .Build();
         using var services = new ServiceCollection()
             .AddLogging()
-            .AddApplication()
-            .AddPostgreSQL(configuration)
+            .AddPostgreSQL()
+            .AddApplication(options => options.UsePostgreSQL(configuration))
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
         using var scope = services.CreateScope();
 

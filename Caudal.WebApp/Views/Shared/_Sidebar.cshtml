@@ -1,0 +1,28 @@
+<aside class="sidebar" id="sidebar" aria-label="Menú principal">
+    <a class="logo" asp-controller="Platform" asp-action="Index"><partial name="_Logo" /></a>
+    <div class="side-group">
+        <p>General <span class="phase">FASE 1</span></p>
+        <a class="side-link is-active" asp-controller="Platform" asp-action="Index" aria-current="page"><svg class="ic"><use href="#i-home" /></svg>Resumen</a>
+        <a class="side-link" href="~/transactions"><svg class="ic"><use href="#i-tx" /></svg>Movimientos</a>
+        <a class="side-link" href="~/accounts"><svg class="ic"><use href="#i-wallet" /></svg>Cuentas</a>
+        <a class="side-link" href="~/budgets"><svg class="ic"><use href="#i-pie" /></svg>Presupuestos</a>
+        <a class="side-link" href="~/categories"><svg class="ic"><use href="#i-tag" /></svg>Categorías</a>
+    </div>
+    <div class="side-group">
+        <p>Planificar <span class="phase">FASE 2</span></p>
+        <a class="side-link" href="~/goals"><svg class="ic"><use href="#i-target" /></svg>Metas de ahorro</a>
+        <a class="side-link" href="~/recurring"><svg class="ic"><use href="#i-repeat" /></svg>Recurrentes</a>
+        <a class="side-link" href="~/debts"><svg class="ic"><use href="#i-card" /></svg>Deudas</a>
+        <a class="side-link" href="~/reports"><svg class="ic"><use href="#i-file" /></svg>Reportes</a>
+    </div>
+    <div class="side-group">
+        <p>Cuenta</p>
+        <a class="side-link" href="~/notifications"><svg class="ic"><use href="#i-bell" /></svg>Notificaciones</a>
+        <a class="side-link" href="~/settings"><svg class="ic"><use href="#i-sliders" /></svg>Ajustes</a>
+    </div>
+    <div class="side-foot">
+        <span class="avatar"><svg class="ic"><use href="#i-user" /></svg></span>
+        <span class="side-user">Tu cuenta</span>
+        <a class="side-logout ml-auto" asp-controller="Account" asp-action="Login" aria-label="Cerrar sesión"><svg class="ic"><use href="#i-logout" /></svg></a>
+    </div>
+</aside>

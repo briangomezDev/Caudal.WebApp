@@ -1,5 +1,7 @@
 using Caudal.Application.Services.AppUser.CreateAccount;
+using Caudal.Infraestructure;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Caudal.Application;
@@ -7,12 +9,13 @@ namespace Caudal.Application;
 public static class DependencyInjection
 {
     /// <summary>
-    /// Registra los casos de uso. La infraestructura la registra el proveedor
-    /// de base de datos (por ejemplo AddPostgreSQL) desde el proyecto web.
+    /// Registra los casos de uso y la infraestructura. El proyecto web elige el motor
+    /// con configureDatabase y registra su proveedor (por ejemplo AddPostgreSQL).
     /// </summary>
-    public static IServiceCollection AddApplication(this IServiceCollection service)
+    public static IServiceCollection AddApplication(this IServiceCollection service, Action<DbContextOptionsBuilder> configureDatabase)
     {
         service.AddValidators();
+        service.AddInfrastructure(configureDatabase);
         service.AddScoped<IUserCreateAccountUseCase, UserCreateAccountUseCase>();
         return service;
     }

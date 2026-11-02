@@ -7,16 +7,21 @@ namespace Caudal.Infraestructure.PostgreSQL;
 public static class DependencyInjection
 {
     /// <summary>
-    /// Registra la infraestructura usando PostgreSQL como motor.
-    /// Es la única línea que la aplicación necesita para usar este proveedor.
+    /// Registra lo que PostgreSQL aporta a la infraestructura: su mapeo de entidades
+    /// y cómo reconoce una violación de clave única.
     /// </summary>
-    public static IServiceCollection AddPostgreSQL(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddPostgreSQL(this IServiceCollection services)
     {
         services.AddSingleton<IDatabaseProvider, PostgreSQLDatabaseProvider>();
 
-        services.AddInfrastructure(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-
         return services;
+    }
+
+    /// <summary>
+    /// Configura el DbContext para usar PostgreSQL con la cadena de conexión DefaultConnection.
+    /// </summary>
+    public static DbContextOptionsBuilder UsePostgreSQL(this DbContextOptionsBuilder options, IConfiguration configuration)
+    {
+        return options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
     }
 }

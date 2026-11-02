@@ -20,7 +20,8 @@ public class DependencyInjectionTests
             .Build();
 
         return new ServiceCollection()
-            .AddPostgreSQL(configuration)
+            .AddPostgreSQL()
+            .AddInfrastructure(options => options.UsePostgreSQL(configuration))
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
     }
 

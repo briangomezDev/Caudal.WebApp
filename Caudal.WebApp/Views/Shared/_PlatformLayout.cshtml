@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <partial name="_Head" />
+</head>
+<body>
+    <partial name="_Icons" />
+    <div class="shell">
+        <partial name="_Sidebar" />
+        <div class="scrim" id="scrim"></div>
+        <div class="main">
+            <partial name="_Topbar" />
+            <main class="view page-content">
+                @RenderBody()
+            </main>
+            <a class="fab" href="~/transactions/new" aria-label="Nuevo movimiento"><svg class="ic"><use href="#i-plus" /></svg></a>
+        </div>
+    </div>
+    <script src="~/js/caudal.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

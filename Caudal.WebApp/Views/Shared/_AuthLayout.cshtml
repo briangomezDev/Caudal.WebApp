@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <partial name="_Head" />
+</head>
+<body>
+    <partial name="_Icons" />
+    <div class="view auth">
+        <partial name="_BrandPanel" />
+        <main class="auth-form">
+            <div class="inner">
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+    <script src="~/js/caudal.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

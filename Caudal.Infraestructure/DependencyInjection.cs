@@ -10,8 +10,8 @@ public static class DependencyInjection
 {
     /// <summary>
     /// Registra la infraestructura sin depender de ningún motor.
-    /// La llama el proyecto del proveedor (por ejemplo AddPostgreSQL), que aporta
-    /// la conexión y su implementación de IDatabaseProvider.
+    /// La llama AddApplication con la conexión que recibe del proyecto web. La implementación
+    /// de IDatabaseProvider la registra el proyecto del proveedor (por ejemplo AddPostgreSQL).
     /// </summary>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, Action<DbContextOptionsBuilder> configureDatabase)
     {
