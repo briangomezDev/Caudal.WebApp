@@ -1,4 +1,4 @@
-namespace Caudal.Domain.Security.ValueObjects;
+namespace Caudal.Domain.Shared.ValueObjects;
 
 public class DomainException :  System.Exception
 {

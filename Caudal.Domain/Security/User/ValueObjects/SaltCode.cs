@@ -11,8 +11,8 @@ public class SaltCode : ValueObject
         if (string.IsNullOrWhiteSpace(value))
           throw new UserInvalidSaltCodeException("Salt code cannot be null or empty.");
 
-        if (value.Length < 6)
-            throw new UserInvalidSaltCodeException("Salt code must be at least 6 characters long.");
+        if (value.Length > 10)
+            throw new UserInvalidSaltCodeException("Salt code must be no more than 10 characters long.");
 
         Value = value;
     }

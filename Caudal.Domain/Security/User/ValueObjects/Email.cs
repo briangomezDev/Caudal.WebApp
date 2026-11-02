@@ -9,12 +9,15 @@ public class Email : ValueObject
     private Email(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new InvalidEmailFormatException("Email cannot be null or empty.");
+            throw new UserInvalidEmailFormatException("Email cannot be null or empty.");
 
         if (!value.Contains("@"))
-            throw new InvalidEmailFormatException("Email must contain '@' symbol.");
+            throw new UserInvalidEmailFormatException("Email must contain '@' symbol.");
+            
+        if(value.Length > 100)
+            throw new UserInvalidEmailFormatException("Email must be no more than 100 characters long.");
 
-        Value = value;
+        Value = value.Trim().ToLower();
     }
     public static Email Create(string value)
     {
