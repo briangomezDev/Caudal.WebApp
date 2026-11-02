@@ -2,5 +2,7 @@
   <Project Path="Caudal.Domain.Testing/Caudal.Domain.Testing.csproj" />
   <Project Path="Caudal.Domain/Caudal.Domain.csproj" />
   <Project Path="Caudal.Infraestructure.PostgreSQL/Caudal.Infraestructure.PostgreSQL.csproj" />
+  <Project Path="Caudal.Infraestructure.Testing/Caudal.Infraestructure.Testing.csproj" />
+  <Project Path="Caudal.Infraestructure/Caudal.Infraestructure.csproj" />
   <Project Path="Caudal.WebApp/Caudal.WebApp.csproj" />
 </Solution>

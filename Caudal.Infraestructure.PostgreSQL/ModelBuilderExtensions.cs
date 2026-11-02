@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Caudal.Infraestructure.PostgreSQL.Configuration;
+namespace Caudal.Infraestructure.PostgreSQL;
 
 public static class ModelBuilderExtensions
 {
