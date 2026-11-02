@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Caudal.Domain/Caudal.Domain.csproj" />
+  <Project Path="Caudal.WebApp/Caudal.WebApp.csproj" />
+</Solution>
