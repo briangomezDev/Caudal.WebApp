@@ -5,4 +5,6 @@
   <Project Path="Caudal.Infraestructure.Testing/Caudal.Infraestructure.Testing.csproj" />
   <Project Path="Caudal.Infraestructure/Caudal.Infraestructure.csproj" />
   <Project Path="Caudal.WebApp/Caudal.WebApp.csproj" />
+  <Project Path="Caudal.Application.Testing/Caudal.Application.Testing.csproj" />
+  <Project Path="Caudal.Application/Caudal.Application.csproj" />
 </Solution>

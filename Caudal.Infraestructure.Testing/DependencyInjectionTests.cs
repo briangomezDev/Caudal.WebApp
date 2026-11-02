@@ -1,4 +1,5 @@
 using Caudal.Domain.Security.Adapter;
+using Caudal.Domain.Security.Service;
 using Caudal.Infraestructure.Port.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +39,22 @@ public class DependencyInjectionTests
         // Assert
         Assert.IsType<UnitOfWork>(unitOfWork);
         Assert.IsType<UserRepository>(repository);
+    }
+
+    [Fact]
+    public void AddInfrastructure_WithConfiguration_ResolvesSecurityServices()
+    {
+        // Arrange
+        using var services = CreateServices();
+        using var scope = services.CreateScope();
+
+        // Act
+        var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+        var saltCodeGenerator = scope.ServiceProvider.GetRequiredService<ISaltCodeGenerator>();
+
+        // Assert
+        Assert.IsType<PasswordHasher>(passwordHasher);
+        Assert.IsType<CryptographySaltCodeGenerator>(saltCodeGenerator);
     }
 
     [Fact]

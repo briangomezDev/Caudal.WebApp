@@ -20,7 +20,7 @@ internal class UserRepository : IUserRepository
         await _dbcontext.Users.AddAsync(user, cancellationToken);
     }
 
-    public async Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken)
+    public async Task<bool> ExistsByEmailAsync(Email? email, CancellationToken cancellationToken)
     {
         if (_dbcontext.Users is null)
             throw new ArgumentNullException(nameof(_dbcontext.Users));
@@ -28,7 +28,7 @@ internal class UserRepository : IUserRepository
         return await _dbcontext.Users.AnyAsync(x => x.Email == email, cancellationToken);
     }
 
-    public async Task<User?> GetByEmailAsync(Email email, CancellationToken cancellationToken)
+    public async Task<User?> GetByEmailAsync(Email? email, CancellationToken cancellationToken)
     {
         if (_dbcontext.Users is null)
             throw new ArgumentNullException(nameof(_dbcontext.Users));

@@ -1,3 +1,7 @@
+using Caudal.Domain.Shared.ValueObjects;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
+
 namespace Caudal.Infraestructure;
 
 internal sealed class UnitOfWork : IUnitOfWork
@@ -13,6 +17,15 @@ internal sealed class UnitOfWork : IUnitOfWork
 
     public Task RollbackTransactionAsync() => _dbContext.Database.RollbackTransactionAsync();
     
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) => _dbContext.SaveChangesAsync(cancellationToken);
-    
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } postgresException)
+        {
+            throw new UniqueConstraintException(postgresException.ConstraintName, "A unique constraint was violated.");
+        }
+    }
 }
