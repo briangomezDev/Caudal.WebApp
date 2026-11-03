@@ -202,6 +202,8 @@ body { font-family: var(--f-body); font-size: 15px; }
 .label { color: var(--c-ink); font-weight: 600; font-size: .88rem; }
 .input { background: var(--c-surface); border-color: var(--c-line); color: var(--c-ink); box-shadow: none; }
 .input:focus { border-color: var(--c-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-primary) 18%, transparent); }
+.input.is-danger { border-color: var(--c-expense); }
+.input.is-danger:focus { border-color: var(--c-expense); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-expense) 18%, transparent); }
 .help { color: var(--c-muted); }
 .control.has-icons-left .icon { color: var(--c-muted); height: 2.5em; }
 .field.has-addons .control .button { height: 100%; }

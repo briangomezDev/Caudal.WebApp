@@ -6,36 +6,49 @@
 }
 <h2 class="title is-3 mb-1">Crea tu cuenta</h2>
 <p class="subtitle is-6 mb-5">Sin tarjeta de crédito. Sin letra pequeña.</p>
-<form asp-controller="Account" asp-action="Register" method="post">
+<form asp-controller="Account" asp-action="Register" method="post" novalidate
+      data-feature="account" data-on-submit="register" data-login-url="@Url.Action("Login", "Account")">
     <div class="field">
         <label class="label" for="reg-name">Nombre</label>
         <div class="control has-icons-left">
-            <input class="input" id="reg-name" name="FullName" type="text" autocomplete="name" placeholder="¿Cómo te llamamos?" required />
+            <input class="input" id="reg-name" name="FullName" type="text" autocomplete="name" placeholder="¿Cómo te llamamos?" maxlength="150" required aria-describedby="reg-name-error" data-model="fullName" data-on-blur="touch" data-bind-invalid="fullNameError" data-bind-class="is-danger:fullNameError" />
             <span class="icon is-left"><svg class="ic"><use href="#i-user" /></svg></span>
         </div>
+        <p class="help is-danger is-hidden" id="reg-name-error" role="alert" data-bind-text="fullNameError" data-bind-class="is-hidden:!fullNameError"></p>
     </div>
     <div class="field">
         <label class="label" for="reg-email">Correo electrónico</label>
         <div class="control has-icons-left">
-            <input class="input" id="reg-email" name="Email" type="email" autocomplete="email" placeholder="tu@correo.com" required />
+            <input class="input" id="reg-email" name="Email" type="email" autocomplete="email" placeholder="tu@correo.com" maxlength="100" required aria-describedby="reg-email-error" data-model="email" data-on-blur="touch" data-bind-invalid="emailError" data-bind-class="is-danger:emailError" />
             <span class="icon is-left"><svg class="ic"><use href="#i-mail" /></svg></span>
         </div>
+        <p class="help is-danger is-hidden" id="reg-email-error" role="alert" data-bind-text="emailError" data-bind-class="is-hidden:!emailError"></p>
     </div>
     <div class="field">
         <label class="label" for="reg-pass">Contraseña</label>
         <div class="field has-addons mb-0">
             <div class="control has-icons-left is-expanded">
-                <input class="input" id="reg-pass" name="Password" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" minlength="8" maxlength="128" required aria-describedby="reg-strength-txt" data-strength="reg-strength" data-strength-text="reg-strength-txt" />
+                <input class="input" id="reg-pass" name="Password" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" minlength="8" maxlength="128" required aria-describedby="reg-strength-txt reg-pass-error" data-strength="reg-strength" data-strength-text="reg-strength-txt" data-model="password" data-on-blur="touch" data-bind-invalid="passwordError" data-bind-class="is-danger:passwordError" />
                 <span class="icon is-left"><svg class="ic"><use href="#i-lock" /></svg></span>
             </div>
             <div class="control"><button type="button" class="button" data-toggle-pass="reg-pass" aria-label="Mostrar contraseña"><svg class="ic"><use href="#i-eye" /></svg></button></div>
         </div>
         <div class="strength" id="reg-strength" data-lvl="0"><i></i><i></i><i></i><i></i></div>
         <p class="help" id="reg-strength-txt" aria-live="polite">Usa 8 o más caracteres, con un número y una mayúscula.</p>
+        <p class="help is-danger is-hidden" id="reg-pass-error" role="alert" data-bind-text="passwordError" data-bind-class="is-hidden:!passwordError"></p>
     </div>
     <div class="field">
-        <label class="checkbox is-size-7"><input type="checkbox" id="reg-terms" required /> Acepto los <a href="~/terms">términos</a> y la <a href="~/privacy">política de privacidad</a></label>
+        <label class="checkbox is-size-7"><input type="checkbox" id="reg-terms" required aria-describedby="reg-terms-error" data-model="terms" data-on-blur="touch" data-bind-invalid="termsError" /> Acepto los <a href="~/terms">términos</a> y la <a href="~/privacy">política de privacidad</a></label>
+        <p class="help is-danger is-hidden" id="reg-terms-error" role="alert" data-bind-text="termsError" data-bind-class="is-hidden:!termsError"></p>
     </div>
-    <button class="button is-tertiary is-fullwidth is-medium mt-4" type="submit">Crear cuenta</button>
+    <div class="notification is-danger is-light is-hidden" role="alert" data-bind-text="error" data-bind-class="is-hidden:!error"></div>
+    <button class="button is-tertiary is-fullwidth is-medium mt-4" type="submit" data-bind-disabled="loading" data-bind-class="is-loading:loading">Crear cuenta</button>
 </form>
 <p class="has-text-centered is-size-7 mt-4 muted">¿Ya tienes cuenta? <a asp-controller="Account" asp-action="Login" class="has-text-weight-semibold">Inicia sesión</a></p>
+
+@section Scripts {
+    <script type="module">
+        import { render } from '@Url.Content("~/js/features/account/index.js")';
+        render(document.querySelector('[data-feature="account"]'));
+    </script>
+}

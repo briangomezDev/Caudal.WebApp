@@ -14,7 +14,7 @@ public abstract class BaseController : Controller
                 ModelState.AddModelError(error.Code, error.Description);
             }
 
-            return ValidationProblem(ModelState);
+            return ValidationProblem(ModelState); 
         }
 
         var firstError = errors.First(error => error.Type != ErrorType.Validation);

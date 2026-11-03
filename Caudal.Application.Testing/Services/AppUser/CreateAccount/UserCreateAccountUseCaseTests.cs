@@ -17,7 +17,7 @@ namespace Caudal.Application.Testing.Services.AppUser.CreateAccount;
 
 public class UserCreateAccountUseCaseTests
 {
-    private static readonly UserRequest ValidRequest = new("Brian Gomez", "Brian@Caudal.com", "correct-password");
+    private static readonly UserRequest ValidRequest = new("Brian Gomez", "Brian@Caudal.com", "Correct-password1");
 
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
     private readonly Mock<IUserRepository> _repository = new();
@@ -85,7 +85,7 @@ public class UserCreateAccountUseCaseTests
         Assert.Equal(new SaltCode("abc123"), addedUser.SaltCode);
         Assert.Equal(UserStatus.Active, addedUser.Status);
         Assert.Equal(DateTimeKind.Utc, addedUser.AccountCreatedAt!.Value.Kind);
-        _passwordHasher.Verify(h => h.Hash("correct-password"), Times.Once);
+        _passwordHasher.Verify(h => h.Hash("Correct-password1"), Times.Once);
     }
 
     [Fact]

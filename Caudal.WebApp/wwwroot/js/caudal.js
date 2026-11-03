@@ -19,11 +19,15 @@
     'Excelente.'
   ];
   function strength(value) {
+    const hasUpper = /\p{Lu}/u.test(value);
+    const hasDigit = /[0-9]/.test(value);
     let score = 0;
     if (value.length >= 8) score++;
-    if (/[A-Z]/.test(value)) score++;
-    if (/\d/.test(value)) score++;
+    if (hasUpper) score++;
+    if (hasDigit) score++;
     if (/[^A-Za-z0-9]/.test(value) || value.length >= 12) score++;
+    // Sin número o mayúscula no es válida: nunca debe verse como "Buena".
+    if (!hasUpper || !hasDigit) score = Math.min(score, 2);
     return value ? Math.max(1, score) : 0;
   }
   $$('[data-strength]').forEach(input => input.addEventListener('input', () => {

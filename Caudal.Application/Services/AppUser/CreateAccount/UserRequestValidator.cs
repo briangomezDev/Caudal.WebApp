@@ -21,7 +21,9 @@ public class UserRequestValidator : AbstractValidator<UserRequest>
             .Cascade(CascadeMode.Stop)
             .NotEmpty().WithErrorCode("SECURITY-0006").WithMessage("The password is required")
             .MinimumLength(8).WithErrorCode("SECURITY-0007").WithMessage("The password must be at least 8 characters")
-            .MaximumLength(128).WithErrorCode("SECURITY-0009").WithMessage("The password must be 128 characters or fewer");
+            .MaximumLength(128).WithErrorCode("SECURITY-0009").WithMessage("The password must be 128 characters or fewer")
+            .Matches("[0-9]").WithErrorCode("SECURITY-0013").WithMessage("The password must contain a number")
+            .Matches(@"\p{Lu}").WithErrorCode("SECURITY-0014").WithMessage("The password must contain an uppercase letter");
 
     }
 }

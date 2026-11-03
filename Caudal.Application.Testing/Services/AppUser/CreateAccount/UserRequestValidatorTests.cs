@@ -7,7 +7,7 @@ public class UserRequestValidatorTests
 {
     private const string ValidName = "Brian Gomez";
     private const string ValidEmail = "brian@caudal.com";
-    private const string ValidPassword = "correct-password";
+    private const string ValidPassword = "Correct-password1";
 
     public static TheoryData<string?, string?, string?, string> InvalidRequests => new()
     {
@@ -22,15 +22,18 @@ public class UserRequestValidatorTests
         { ValidName, ValidEmail, null, "SECURITY-0006" },
         { ValidName, ValidEmail, "", "SECURITY-0006" },
         { ValidName, ValidEmail, new string('a', 7), "SECURITY-0007" },
-        { ValidName, ValidEmail, new string('a', 129), "SECURITY-0009" }
+        { ValidName, ValidEmail, new string('a', 129), "SECURITY-0009" },
+        { ValidName, ValidEmail, "Aaaaaaaa", "SECURITY-0013" },
+        { ValidName, ValidEmail, "aaaaaaa1", "SECURITY-0014" }
     };
 
     public static TheoryData<string, string, string> BoundaryRequests => new()
     {
         { new string('a', 150), ValidEmail, ValidPassword },
         { ValidName, new string('a', 89) + "@caudal.com", ValidPassword },
-        { ValidName, ValidEmail, new string('a', 8) },
-        { ValidName, ValidEmail, new string('a', 128) }
+        { ValidName, ValidEmail, "Aaaaaaa1" },
+        { ValidName, ValidEmail, "A1" + new string('a', 126) },
+        { ValidName, ValidEmail, "Ñaaaaaa1" }
     };
 
     // Bueno: las solicitudes válidas se aceptan.
