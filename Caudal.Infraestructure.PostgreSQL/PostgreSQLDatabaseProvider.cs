@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace Caudal.Infraestructure.PostgreSQL;
 
-public sealed class PostgreSQLDatabaseProvider : IDatabaseProvider
+internal sealed class PostgreSQLDatabaseProvider : IDatabaseProvider
 {
     public void ConfigureModel(ModelBuilder modelBuilder)
     {
