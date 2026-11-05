@@ -1,0 +1,44 @@
+<SectionContent SectionName="@SectionName">
+    <aside class="auth-brand">
+        <a class="logo" href="/account/login"><Logo /></a>
+        <div>
+            <h1>@Title</h1>
+            <p class="mt-3">@Lead</p>
+        </div>
+        @switch (Variant)
+        {
+            case BrandVariant.Register:
+                <ul class="brand-legend">
+                    <li><span class="sw is-gold"></span>Gratis para siempre en lo esencial</li>
+                    <li><span class="sw is-periwinkle"></span>Exporta tus datos cuando quieras</li>
+                </ul>
+                <div class="trust"><span><svg class="ic"><use href="#i-lock" /></svg>Tus datos, cifrados</span></div>
+                break;
+            case BrandVariant.Restore:
+                <div class="trust"><span><svg class="ic"><use href="#i-shield" /></svg>Nunca te pediremos tu contraseña por correo</span></div>
+                break;
+            default:
+                <div class="preview-card">
+                    <p class="eyebrow">Te queda este mes</p>
+                    <p class="money is-size-3">RD$ 14,280</p>
+                    <div class="bar mt-3"><span></span></div>
+                    <p class="is-size-7 mt-2">68 % del presupuesto usado · faltan 9 días</p>
+                </div>
+                <div class="trust">
+                    <span><svg class="ic"><use href="#i-lock" /></svg>Cifrado de extremo a extremo</span>
+                    <span><svg class="ic"><use href="#i-shield" /></svg>Verificación en dos pasos</span>
+                    <span><svg class="ic"><use href="#i-eye" /></svg>No vendemos tus datos</span>
+                </div>
+                break;
+        }
+    </aside>
+</SectionContent>
+
+@code {
+    // Lo declara cada página, pero se pinta fuera de @Body: es hermano de <main> en AuthLayout.
+    public const string SectionName = "auth-brand";
+
+    [Parameter] public BrandVariant Variant { get; set; }
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter, EditorRequired] public string Lead { get; set; } = "";
+}

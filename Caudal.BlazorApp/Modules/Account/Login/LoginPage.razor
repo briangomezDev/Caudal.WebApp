@@ -1,0 +1,42 @@
+@page "/account/login"
+@layout AuthLayout
+
+<PageTitle>Iniciar sesión · Caudal</PageTitle>
+
+<BrandPanel Title="Sabe a dónde va tu dinero y cuánto te queda."
+            Lead="Registra un gasto en tres toques, arma tu presupuesto y mira crecer tus metas de ahorro mes a mes." />
+
+<h2 class="title is-3 mb-1">Bienvenido de vuelta</h2>
+<p class="subtitle is-6 mb-5">Entra para ver tu resumen del mes.</p>
+@* Estático a propósito: un circuito interactivo no puede escribir la cookie de sesión. *@
+<PendingForm Name="login">
+    <div class="field">
+        <label class="label" for="login-email">Correo electrónico</label>
+        <div class="control has-icons-left">
+            <input class="input is-medium" id="login-email" name="Email" type="email" autocomplete="email" placeholder="tu@correo.com" required />
+            <span class="icon is-left"><svg class="ic"><use href="#i-mail" /></svg></span>
+        </div>
+    </div>
+    <div class="field">
+        <div class="is-flex is-justify-content-space-between is-align-items-baseline">
+            <label class="label" for="login-pass">Contraseña</label>
+            <a href="/account/restore-password" class="is-size-7 has-text-weight-semibold">¿Olvidaste tu contraseña?</a>
+        </div>
+        <div class="field has-addons mb-0">
+            <div class="control has-icons-left is-expanded">
+                <input class="input is-medium" id="login-pass" name="Password" type="password" autocomplete="current-password" placeholder="••••••••" required />
+                <span class="icon is-left"><svg class="ic"><use href="#i-lock" /></svg></span>
+            </div>
+            <div class="control"><button type="button" class="button is-medium" data-toggle-pass="login-pass" aria-label="Mostrar contraseña"><svg class="ic"><use href="#i-eye" /></svg></button></div>
+        </div>
+    </div>
+    <div class="field">
+        <label class="checkbox is-size-7"><input type="checkbox" id="login-remember" name="RememberMe" value="true" checked /> Mantener la sesión en este dispositivo</label>
+    </div>
+    <button class="button is-primary is-medium is-fullwidth mt-4" type="submit">Iniciar sesión</button>
+</PendingForm>
+<div class="divider-or">o continúa con</div>
+<div class="buttons is-centered">
+    <button class="button is-fullwidth" type="button"><span class="google-mark has-text-weight-bold mr-2">G</span>Google</button>
+</div>
+<p class="has-text-centered is-size-7 mt-4 muted">¿Aún no tienes cuenta? <a href="/account/register" class="has-text-weight-semibold">Crea una gratis</a></p>

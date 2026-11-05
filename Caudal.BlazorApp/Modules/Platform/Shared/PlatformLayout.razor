@@ -1,0 +1,13 @@
+@inherits LayoutComponentBase
+
+<div class="shell">
+    <Sidebar />
+    <div class="scrim" id="scrim"></div>
+    <div class="main">
+        <Topbar />
+        <main class="view page-content">
+            @Body
+        </main>
+        <a class="fab" href="/transactions/new" aria-label="Nuevo movimiento"><svg class="ic"><use href="#i-plus" /></svg></a>
+    </div>
+</div>

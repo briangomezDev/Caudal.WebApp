@@ -1,0 +1,13 @@
+@page "/account/register"
+@layout AuthLayout
+
+<PageTitle>Crear cuenta · Caudal</PageTitle>
+
+<BrandPanel Variant="BrandVariant.Register"
+            Title="Empieza con una pregunta: ¿a dónde se va mi dinero?"
+            Lead="En dos minutos tendrás tu primera cuenta, tus categorías y un presupuesto sugerido con la regla 50/30/20." />
+
+<h2 class="title is-3 mb-1">Crea tu cuenta</h2>
+<p class="subtitle is-6 mb-5">Sin tarjeta de crédito. Sin letra pequeña.</p>
+<RegisterFields @rendermode="InteractiveServer" />
+<p class="has-text-centered is-size-7 mt-4 muted">¿Ya tienes cuenta? <a href="/account/login" class="has-text-weight-semibold">Inicia sesión</a></p>

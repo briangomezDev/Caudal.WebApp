@@ -1,0 +1,6 @@
+<p class="help is-danger @(Message is null ? "is-hidden" : "")" id="@Id" role="alert">@Message</p>
+
+@code {
+    [Parameter, EditorRequired] public string Id { get; set; } = "";
+    [Parameter] public string? Message { get; set; }
+}

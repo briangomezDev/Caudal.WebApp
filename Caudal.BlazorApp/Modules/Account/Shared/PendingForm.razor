@@ -1,0 +1,16 @@
+@* Formulario de una pantalla cuyo caso de uso todavía no existe: no procesa datos y lo dice. *@
+<form method="post" data-enhance @formname="@Name" @onsubmit="() => submitted = true">
+    <AntiforgeryToken />
+    @ChildContent
+    @if (submitted)
+    {
+        <div class="notification is-warning is-light mt-4" role="status">Esta función todavía no está disponible.</div>
+    }
+</form>
+
+@code {
+    private bool submitted;
+
+    [Parameter, EditorRequired] public string Name { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

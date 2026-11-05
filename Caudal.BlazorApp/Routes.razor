@@ -1,0 +1,7 @@
+@using Caudal.BlazorApp.Modules.Errors
+
+<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(NotFoundPage)">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" />
+    </Found>
+</Router>
