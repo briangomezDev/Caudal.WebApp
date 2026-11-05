@@ -7,6 +7,8 @@ namespace Caudal.Domain.Security.Session.Adapter;
 public interface IUserSessionRepository
 {
     Task AddAsync(UserSession session, CancellationToken cancellationToken);
+    void Remove(UserSession session);
+    Task RemoveExpiredByUserAsync(UserId userId, DateTime now, CancellationToken cancellationToken);
     Task<UserSession?> GetByIdAsync(SessionId sessionId, CancellationToken cancellationToken);
     Task<UserSession?> GetByUserIdAsync(UserId userId);
     Task<ICollection<UserSession>> GetByUserAndDeviceAsync(UserId userId, string device);

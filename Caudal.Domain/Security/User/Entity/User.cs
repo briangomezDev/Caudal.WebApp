@@ -7,6 +7,9 @@ namespace Caudal.Domain.Security.Entity;
 
 public class User : IAgregateRoot
 {
+    public const short MaxFailedLogins = 5;
+    public static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
+
     public UserId? UserId { get; private set; }
     public string? FullName { get; private set; }
     public Email? Email { get; private set; }
@@ -16,6 +19,7 @@ public class User : IAgregateRoot
     public DateTime? AccountCreatedAt { get; private set; }
     public DateTime? EmailVerifiedAt { get; private set; }
     public DateTime? AccountLockedUntil { get; private set; }
+    public short FailedLoginCount { get; private set; }
 
     private User() { }
 
@@ -33,9 +37,18 @@ public class User : IAgregateRoot
         Status = UserStatus.Active;
     }
 
-    public bool CanLogin(DateTime now)
+    public bool IsEnabled => Status == UserStatus.Active;
+
+    /// <summary>
+    /// Bloqueo temporal por intentos fallidos: impide entrar, pero no termina las sesiones abiertas,
+    /// para que nadie pueda expulsar a otro usuario fallando con su correo.
+    /// </summary>
+    public bool IsLockedOut(DateTime now) => AccountLockedUntil > now;
+
+    public void ResetFailedLogins()
     {
-        return Status == UserStatus.Active && (AccountLockedUntil is null || AccountLockedUntil <= now);
+        FailedLoginCount = 0;
+        AccountLockedUntil = null;
     }
 
     public void UpdateEmailVerifiedAt(DateTime emailVerifiedAt)

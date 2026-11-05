@@ -41,9 +41,9 @@ internal sealed class UserSessionValidationUseCase : IUserSessionValidationUseCa
             if (session is null || !session.IsActive(now))
                 return InvalidSession();
 
-            // Suspender o bloquear a un usuario también termina las sesiones que tenga abiertas.
+            // Suspender o eliminar a un usuario también termina las sesiones que tenga abiertas.
             var user = await _users.GetByIdAsync(session.UserId!, cancellationToken);
-            if (user is null || !user.CanLogin(now))
+            if (user is null || !user.IsEnabled)
             {
                 session.Expire(now);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

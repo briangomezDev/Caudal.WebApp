@@ -86,7 +86,7 @@ public class UserSessionLifecycleTests
     }
 
     [Fact]
-    public async Task LogoutAsync_WithActiveSession_ExpiresItKeepingTheRow()
+    public async Task LogoutAsync_WithActiveSession_RemovesIt()
     {
         // Arrange
         var session = SessionExists(TimeSpan.FromMinutes(5), TimeSpan.FromHours(8));
@@ -96,8 +96,24 @@ public class UserSessionLifecycleTests
 
         // Assert
         Assert.False(result.IsError);
-        Assert.False(session.IsActive(DateTime.UtcNow));
+        _sessions.Verify(s => s.Remove(session), Times.Once);
         VerifySaved(Times.Once());
+    }
+
+    [Fact]
+    public async Task ValidateAsync_DuringTemporaryLockout_KeepsSessionOpen()
+    {
+        // Arrange
+        var user = CreateUser();
+        user.UpdateAccountLockedUntil(DateTime.UtcNow.AddMinutes(10));
+        var session = SessionExists(TimeSpan.FromSeconds(10), TimeSpan.FromHours(8), user);
+
+        // Act
+        var result = await CreateValidation().ValidateAsync(session.SessionId!.Value, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.True(session.IsActive(DateTime.UtcNow));
     }
 
     // Malo: sin sesión vigente, o con el usuario fuera de servicio, no hay acceso.
@@ -170,18 +186,13 @@ public class UserSessionLifecycleTests
     }
 
     [Fact]
-    public async Task LogoutAsync_WithAlreadyExpiredSession_KeepsItsDateAndDoesNotWrite()
+    public async Task LogoutAsync_WithUnknownSession_IsNotAnErrorAndDoesNotWrite()
     {
-        // Arrange
-        var session = SessionExists(TimeSpan.FromHours(9), TimeSpan.FromHours(8));
-        var expiresAt = session.ExpiresAt;
-
         // Act
-        var result = await CreateLogout().LogoutAsync(session.SessionId!.Value, CancellationToken.None);
+        var result = await CreateLogout().LogoutAsync(Guid.NewGuid(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
-        Assert.Equal(expiresAt, session.ExpiresAt);
         VerifySaved(Times.Never());
     }
 }

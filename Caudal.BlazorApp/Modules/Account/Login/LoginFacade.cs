@@ -16,7 +16,8 @@ public sealed class LoginFacade(IServiceScopeFactory scopes)
     {
         ["SECURITY-0003"] = "Escribe tu correo y tu contraseña",
         ["SECURITY-0006"] = "Escribe tu correo y tu contraseña",
-        ["SECURITY-0015"] = "Correo o contraseña incorrectos",
+        // También cubre el bloqueo temporal: decirlo aparte revelaría qué correos existen.
+        ["SECURITY-0015"] = "Correo o contraseña incorrectos. Tras varios intentos fallidos, la cuenta se bloquea 15 minutos.",
         ["SECURITY-0016"] = "Tu cuenta no está disponible. Contacta a soporte.",
     };
 

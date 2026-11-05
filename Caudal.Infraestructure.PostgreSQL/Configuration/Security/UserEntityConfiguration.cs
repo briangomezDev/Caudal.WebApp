@@ -57,7 +57,7 @@ internal class UserEntityConfiguration : IEntityTypeConfiguration<User>
         builder.Property(user => user.EmailVerifiedAt)
             .HasColumnName("email_verified_at");
 
-        builder.Property<short>("FailedLoginCount")
+        builder.Property(user => user.FailedLoginCount)
             .HasColumnName("failed_login_count")
             .IsRequired();
 

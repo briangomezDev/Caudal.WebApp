@@ -61,18 +61,29 @@ internal sealed class UserLoginUseCase : IUserLoginUseCase
                 return InvalidCredentials();
             }
 
-            if (!_passwordHasher.Verify(request.Password, user.Password!, user.SaltCode!))
-                return InvalidCredentials();
-
+            var passwordMatches = _passwordHasher.Verify(request.Password, user.Password!, user.SaltCode!);
             var now = DateTime.UtcNow;
 
+            // Misma respuesta con cualquier contraseña: si fuera distinta, se podría seguir adivinando durante el bloqueo.
+            if (user.IsLockedOut(now))
+                return InvalidCredentials();
+
+            if (!passwordMatches)
+            {
+                await _users.RegisterFailedLoginAsync(user.UserId!, now, cancellationToken);
+                return InvalidCredentials();
+            }
+
             // Va después de la contraseña: solo quien la conoce sabe que la cuenta no está disponible.
-            if (!user.CanLogin(now))
+            if (!user.IsEnabled)
                 return Error.Forbidden("SECURITY-0016", "The account is not available");
+
+            user.ResetFailedLogins();
 
             var duration = request.RememberMe ? RememberedSessionDuration : SessionDuration;
             var session = new UserSession(new SessionId(Guid.NewGuid()), user.UserId!, request.Device, now, now + duration);
 
+            await _sessions.RemoveExpiredByUserAsync(user.UserId!, now, cancellationToken);
             await _sessions.AddAsync(session, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -15,6 +15,10 @@
 {
     <div class="notification is-danger is-light" role="alert">@error</div>
 }
+else if (Reason == LoginRateLimit.ThrottledReason)
+{
+    <div class="notification is-warning is-light" role="alert">Demasiados intentos. Espera un minuto antes de volver a intentarlo.</div>
+}
 else if (Reason == SessionCookieEvents.ExpiredReason)
 {
     <div class="notification is-info is-light" role="status">Tu sesión terminó. Inicia sesión de nuevo para continuar.</div>

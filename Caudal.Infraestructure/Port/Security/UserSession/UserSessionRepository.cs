@@ -20,6 +20,25 @@ internal sealed class UserSessionRepository : IUserSessionRepository
 
         await _dbcontext.UserSessions.AddAsync(session, cancellationToken);
     }
+    public void Remove(UserSession session)
+    {
+        if (_dbcontext.UserSessions is null)
+            throw new ArgumentNullException(nameof(_dbcontext.UserSessions));
+
+        _dbcontext.UserSessions.Remove(session);
+    }
+    public async Task RemoveExpiredByUserAsync(UserId userId, DateTime now, CancellationToken cancellationToken)
+    {
+        if (_dbcontext.UserSessions is null)
+            throw new ArgumentNullException(nameof(_dbcontext.UserSessions));
+
+        // Se cargan en lugar de borrarlas directo: así se guardan junto con lo demás en SaveChanges.
+        var expired = await _dbcontext.UserSessions
+            .Where(x => x.UserId == userId && x.ExpiresAt <= now)
+            .ToListAsync(cancellationToken);
+
+        _dbcontext.UserSessions.RemoveRange(expired);
+    }
     public async Task<UserSession?> GetByIdAsync(SessionId sessionId, CancellationToken cancellationToken)
     {
         if (_dbcontext.UserSessions is null)

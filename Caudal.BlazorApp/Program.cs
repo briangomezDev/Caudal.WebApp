@@ -53,6 +53,8 @@ app.Use((context, next) =>
 
 app.UseHttpsRedirection();
 
+app.UseRateLimiter();
+
 app.UseAuthorization();
 
 app.UseAntiforgery();

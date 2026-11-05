@@ -82,7 +82,7 @@ public class LoginTests
     // Malo: los errores llegan en español y no se inicia sesión.
 
     [Theory]
-    [InlineData("SECURITY-0015", "Correo o contraseña incorrectos")]
+    [InlineData("SECURITY-0015", "Correo o contraseña incorrectos. Tras varios intentos fallidos, la cuenta se bloquea 15 minutos.")]
     [InlineData("SECURITY-0016", "Tu cuenta no está disponible. Contacta a soporte.")]
     [InlineData("SECURITY-0011", "Ocurrió un error inesperado. Intenta de nuevo.")]
     public async Task LoginAsync_WhenUseCaseFails_ReturnsMessageAndDoesNotSignIn(string code, string expected)

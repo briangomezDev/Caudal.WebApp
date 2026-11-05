@@ -44,6 +44,32 @@ internal class UserRepository : IUserRepository
         return await _dbcontext.Users.FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
     }
 
+    public async Task RegisterFailedLoginAsync(UserId userId, DateTime now, CancellationToken cancellationToken)
+    {
+        if (_dbcontext.Users is null)
+            throw new ArgumentNullException(nameof(_dbcontext.Users));
+
+        DateTime? lockedUntil = now + User.LockoutDuration;
+
+        // Un solo UPDATE: dos fallos simultáneos cuentan como dos. Un bloqueo ya cumplido empieza la cuenta de nuevo.
+        await _dbcontext.Users
+            .Where(x => x.UserId == userId)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(
+                    x => x.FailedLoginCount,
+                    x => x.AccountLockedUntil != null && x.AccountLockedUntil <= now
+                        ? (short)1
+                        : (short)(x.FailedLoginCount + 1))
+                .SetProperty(
+                    x => x.AccountLockedUntil,
+                    x => x.AccountLockedUntil != null && x.AccountLockedUntil <= now
+                        ? null
+                        : x.FailedLoginCount + 1 >= User.MaxFailedLogins
+                            ? lockedUntil
+                            : x.AccountLockedUntil),
+                cancellationToken);
+    }
+
     public async Task<User?> GetByProviderAsync(int providerId, string providerUserId, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();

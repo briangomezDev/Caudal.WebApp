@@ -171,20 +171,66 @@ public class UserLoginUseCaseTests
         Assert.Equal("SECURITY-0015", result.FirstError.Code);
     }
 
-    [Fact]
-    public async Task LoginAsync_WithTemporarilyLockedUser_ReturnsAccountUnavailable()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task LoginAsync_DuringLockout_ReturnsSameErrorWithAnyPasswordAndDoesNotCount(bool passwordMatches)
     {
         // Arrange
         var user = CreateUser();
-        user.UpdateAccountLockedUntil(DateTime.UtcNow.AddHours(1));
+        user.UpdateAccountLockedUntil(DateTime.UtcNow.AddMinutes(10));
+        UserExists(user, passwordMatches);
+
+        // Act
+        var result = await CreateUseCase().LoginAsync(ValidRequest, CancellationToken.None);
+
+        // Assert
+        Assert.Equal("SECURITY-0015", result.FirstError.Code);
+        _users.Verify(u => u.RegisterFailedLoginAsync(It.IsAny<UserId>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Never);
+        VerifyNoSession();
+    }
+
+    [Fact]
+    public async Task LoginAsync_WithWrongPassword_RegistersFailedAttempt()
+    {
+        // Arrange
+        var user = UserExists(passwordMatches: false);
+
+        // Act
+        await CreateUseCase().LoginAsync(ValidRequest, CancellationToken.None);
+
+        // Assert
+        _users.Verify(u => u.RegisterFailedLoginAsync(user.UserId!, It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task LoginAsync_AfterLockoutEnds_ClearsItAndLogsIn()
+    {
+        // Arrange
+        var user = CreateUser();
+        user.UpdateAccountLockedUntil(DateTime.UtcNow.AddMinutes(-1));
         UserExists(user);
 
         // Act
         var result = await CreateUseCase().LoginAsync(ValidRequest, CancellationToken.None);
 
         // Assert
-        Assert.Equal("SECURITY-0016", result.FirstError.Code);
-        VerifyNoSession();
+        Assert.False(result.IsError);
+        Assert.Null(user.AccountLockedUntil);
+        Assert.Equal(0, user.FailedLoginCount);
+    }
+
+    [Fact]
+    public async Task LoginAsync_WithValidCredentials_RemovesExpiredSessionsOfThatUser()
+    {
+        // Arrange
+        var user = UserExists();
+
+        // Act
+        await CreateUseCase().LoginAsync(ValidRequest, CancellationToken.None);
+
+        // Assert
+        _sessions.Verify(s => s.RemoveExpiredByUserAsync(user.UserId!, It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Theory]

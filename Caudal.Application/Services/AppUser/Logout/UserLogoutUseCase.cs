@@ -29,13 +29,12 @@ internal sealed class UserLogoutUseCase : IUserLogoutUseCase
                 return true;
 
             var session = await _sessions.GetByIdAsync(new SessionId(sessionId), cancellationToken);
-            var now = DateTime.UtcNow;
 
-            // Cerrar una sesión que ya terminó no es un error, y conserva su fecha real de expiración.
-            if (session is null || !session.IsActive(now))
+            // Cerrar una sesión que ya no existe no es un error.
+            if (session is null)
                 return true;
 
-            session.Expire(now);
+            _sessions.Remove(session);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return true;

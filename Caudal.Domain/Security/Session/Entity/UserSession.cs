@@ -60,7 +60,7 @@ public class UserSession : IAgregateRoot
         UpdateExpiresAt(now + duration);
     }
     /// <summary>
-    /// Termina la sesión sin borrar la fila, para conservar el historial de accesos.
+    /// Termina la sesión desde fuera del navegador del usuario. La fila se borra en su siguiente login.
     /// </summary>
     public void Expire(DateTime now)
     {
