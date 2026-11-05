@@ -1,5 +1,6 @@
 using Caudal.Application;
 using Caudal.Infraestructure.PostgreSQL;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,17 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddPostgreSQL();
 builder.Services.AddApplication(options => options.UsePostgreSQL(builder.Configuration));
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+.AddCookie(option =>
+{
+    option.LoginPath = "/account/login";
+    option.Cookie.Name = "caudal.auth";
+    option.Cookie.HttpOnly = true;
+    option.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    option.Cookie.SameSite = SameSiteMode.Lax;
+    option.ExpireTimeSpan = TimeSpan.FromHours(8);
+    option.SlidingExpiration = true;
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
