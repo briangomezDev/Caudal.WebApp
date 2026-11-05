@@ -2,6 +2,7 @@ using Caudal.Domain.Security.Adapter;
 using Caudal.Domain.Security.Service;
 using Caudal.Domain.Security.Session.Adapter;
 using Caudal.Infraestructure.Port.Security;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,6 +36,8 @@ public static class DependencyInjection
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         services.AddScoped<ISaltCodeGenerator, CryptographySaltCodeGenerator>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddDataProtection();
+        services.AddScoped<IAccountConfirmationTokens, DataProtectionAccountConfirmationTokens>();
         return services;
     }
 }

@@ -1,0 +1,49 @@
+@page "/account/resend-confirmation"
+@layout AuthLayout
+@inject ConfirmationFacade Facade
+
+<PageTitle>Pedir otro enlace · Caudal</PageTitle>
+
+<BrandPanel Variant="BrandVariant.Register"
+            Title="Solo falta confirmar que el correo es tuyo."
+            Lead="Así protegemos tu cuenta y sabemos a dónde escribirte si necesitas recuperarla." />
+
+<a href="/account/login" class="is-size-7 has-text-weight-semibold is-inline-flex is-align-items-center mb-5"><svg class="ic mr-1"><use href="#i-left" /></svg>Volver a iniciar sesión</a>
+<h2 class="title is-4 mb-1">Pide otro enlace</h2>
+<p class="subtitle is-6 mb-5">Escribe el correo con el que te registraste.</p>
+@if (sent)
+{
+    @* El mismo mensaje exista o no la cuenta: no debe revelar qué correos están registrados. *@
+    <div class="notification is-success is-light" role="status">Si ese correo tiene una cuenta sin confirmar, te enviamos un enlace nuevo.</div>
+}
+else if (Reason == AccountRateLimit.ThrottledReason)
+{
+    <div class="notification is-warning is-light" role="alert">Demasiados intentos. Espera un minuto antes de volver a intentarlo.</div>
+}
+<form method="post" @formname="resend-confirmation" @onsubmit="ResendAsync">
+    <AntiforgeryToken />
+    <div class="field">
+        <label class="label" for="resend-email">Correo electrónico</label>
+        <div class="control has-icons-left">
+            <input class="input is-medium" id="resend-email" name="Email" type="email" autocomplete="email" placeholder="tu@correo.com" required />
+            <span class="icon is-left"><svg class="ic"><use href="#i-mail" /></svg></span>
+        </div>
+    </div>
+    <button class="button is-primary is-medium is-fullwidth mt-3" type="submit">Enviar enlace</button>
+</form>
+
+@code {
+    private bool sent;
+
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm(FormName = "resend-confirmation")] private string? Email { get; set; }
+
+    [SupplyParameterFromQuery] private string? Reason { get; set; }
+
+    private async Task ResendAsync()
+    {
+        await Facade.ResendAsync(Email, HttpContext.RequestAborted);
+        sent = true;
+    }
+}

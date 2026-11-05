@@ -4,6 +4,7 @@
   <Project Path="Caudal.Infraestructure.PostgreSQL/Caudal.Infraestructure.PostgreSQL.csproj" />
   <Project Path="Caudal.Infraestructure.Testing/Caudal.Infraestructure.Testing.csproj" />
   <Project Path="Caudal.Infraestructure/Caudal.Infraestructure.csproj" />
+  <Project Path="Caudal.Infraestructure.Mailing/Caudal.Infraestructure.Mailing.csproj" />
   <Project Path="Caudal.Application.Testing/Caudal.Application.Testing.csproj" />
   <Project Path="Caudal.Application/Caudal.Application.csproj" />
   <Project Path="Caudal.BlazorApp/Caudal.BlazorApp.csproj" />

@@ -21,6 +21,7 @@
     <ProjectReference Include="..\Caudal.Domain\Caudal.Domain.csproj" />
     <ProjectReference Include="..\Caudal.Infraestructure\Caudal.Infraestructure.csproj" />
     <ProjectReference Include="..\Caudal.Infraestructure.PostgreSQL\Caudal.Infraestructure.PostgreSQL.csproj" />
+    <ProjectReference Include="..\Caudal.Infraestructure.Mailing\Caudal.Infraestructure.Mailing.csproj" />
   </ItemGroup>
 
 </Project>

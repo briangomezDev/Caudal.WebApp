@@ -1,3 +1,4 @@
+using Caudal.Application.Services.AppUser.Confirmation;
 using Caudal.Domain.Security.Adapter;
 using Caudal.Domain.Security.Entity;
 using Caudal.Domain.Security.Service;
@@ -17,18 +18,21 @@ internal sealed class UserCreateAccountUseCase : IUserCreateAccountUseCase
     private readonly IUserRepository _repository;
     private readonly IValidator<UserRequest> _validator;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly AccountConfirmationSender _confirmationSender;
 
     public UserCreateAccountUseCase(ILogger<UserCreateAccountUseCase> logger,
                                 IUnitOfWork unitOfWork,
                                 IUserRepository repository,
                                 IValidator<UserRequest> validator,
-                                IPasswordHasher passwordHasher)
+                                IPasswordHasher passwordHasher,
+                                AccountConfirmationSender confirmationSender)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _validator = validator ?? throw new ArgumentNullException(nameof(validator));
         _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
+        _confirmationSender = confirmationSender ?? throw new ArgumentNullException(nameof(confirmationSender));
     }
     public async Task<ErrorOr<bool>> CreateAccountAsync(UserRequest request, CancellationToken cancellationToken)
     {
@@ -40,11 +44,18 @@ internal sealed class UserCreateAccountUseCase : IUserCreateAccountUseCase
                 Error.Validation(x.ErrorCode, x.ErrorMessage)).ToList();
 
             Email email = Email.Create(request.Email);
+            var now = DateTime.UtcNow;
 
-            var userAlredyExists = await _repository.ExistsByEmailAsync(email, cancellationToken);
+            var existing = await _repository.GetByEmailAsync(email, cancellationToken);
 
-            if (userAlredyExists)
-                return Error.Conflict("SECURITY-0012", "User already exists with this email");
+            if (existing is not null)
+            {
+                if (!existing.HasConfirmationExpired(now))
+                    return Error.Conflict("SECURITY-0012", "User already exists with this email");
+
+                // Nadie confirmó a tiempo: libera el correo sin necesidad de un job que limpie estas cuentas.
+                _repository.RemoveUser(existing);
+            }
 
             UserId id = new UserId(Guid.NewGuid());
 
@@ -56,11 +67,13 @@ internal sealed class UserCreateAccountUseCase : IUserCreateAccountUseCase
                 email,
                 PasswordHash,
                 Salt,
-                DateTime.UtcNow
+                now
             );
 
             await _repository.AddUserAsync(user, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            await _confirmationSender.SendAsync(user, cancellationToken);
 
             return true;
         }

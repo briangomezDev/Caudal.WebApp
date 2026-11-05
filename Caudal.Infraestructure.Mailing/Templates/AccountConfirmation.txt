@@ -1,0 +1,7 @@
+Hola, {{name}}. Gracias por crear tu cuenta en Caudal.
+
+Confirma que este correo es tuyo para empezar a usarla. El enlace vence en 24 horas:
+
+{{link}}
+
+Si no creaste esta cuenta, ignora este mensaje.

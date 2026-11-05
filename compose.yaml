@@ -1,0 +1,8 @@
+# Servidor de correo solo para desarrollo: atrapa los mensajes sin enviarlos.
+# Levántalo con "docker compose up -d" y mira los correos en http://localhost:8025
+services:
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"

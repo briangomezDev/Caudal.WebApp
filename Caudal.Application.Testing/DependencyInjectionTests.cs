@@ -1,8 +1,10 @@
 using Caudal.Application.Services.AppUser.CreateAccount;
+using Caudal.Domain.Security.Service;
 using Caudal.Infraestructure.PostgreSQL;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace Caudal.Application.Testing;
@@ -21,6 +23,7 @@ public class DependencyInjectionTests
             .Build();
         using var services = new ServiceCollection()
             .AddLogging()
+            .AddScoped(_ => Mock.Of<IAccountNotifier>())
             .AddPostgreSQL()
             .AddApplication(options => options.UsePostgreSQL(configuration))
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });

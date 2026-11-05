@@ -1,0 +1,49 @@
+@page "/account/confirm"
+@layout AuthLayout
+@inject ConfirmationFacade Facade
+@inject NavigationManager Navigation
+
+<PageTitle>Confirma tu correo · Caudal</PageTitle>
+
+<BrandPanel Variant="BrandVariant.Register"
+            Title="Solo falta confirmar que el correo es tuyo."
+            Lead="Así protegemos tu cuenta y sabemos a dónde escribirte si necesitas recuperarla." />
+
+@if (outcome == ConfirmationOutcome.InvalidLink || string.IsNullOrWhiteSpace(Token))
+{
+    <div class="icon-circle"><svg class="ic"><use href="#i-alert" /></svg></div>
+    <h2 class="title is-4 mb-1">Este enlace ya no sirve</h2>
+    <p class="subtitle is-6 mb-5">Puede estar incompleto o haber vencido. Pide otro y úsalo en las próximas 24 horas.</p>
+    <a class="button is-primary is-medium is-fullwidth" href="/account/resend-confirmation">Pedir otro enlace</a>
+}
+else
+{
+    <div class="icon-circle"><svg class="ic"><use href="#i-mail" /></svg></div>
+    <h2 class="title is-4 mb-1">Confirma tu correo</h2>
+    <p class="subtitle is-6 mb-5">Pulsa el botón para activar tu cuenta.</p>
+    @if (outcome == ConfirmationOutcome.Failed)
+    {
+        <div class="notification is-danger is-light" role="alert">Ocurrió un error inesperado. Intenta de nuevo.</div>
+    }
+    @* Confirmar exige un POST: algunos antivirus de correo abren los enlaces solos y confirmarían la cuenta. *@
+    <form method="post" @formname="confirm-account" @onsubmit="ConfirmAsync">
+        <AntiforgeryToken />
+        <button class="button is-primary is-medium is-fullwidth" type="submit">Confirmar mi correo</button>
+    </form>
+}
+
+@code {
+    private ConfirmationOutcome? outcome;
+
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromQuery] private string? Token { get; set; }
+
+    private async Task ConfirmAsync()
+    {
+        outcome = await Facade.ConfirmAsync(Token, HttpContext.RequestAborted);
+
+        if (outcome == ConfirmationOutcome.Confirmed)
+            Navigation.NavigateTo("/account/login?reason=confirmed");
+    }
+}

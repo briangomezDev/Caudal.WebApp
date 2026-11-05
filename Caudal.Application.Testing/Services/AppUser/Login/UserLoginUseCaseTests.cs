@@ -30,13 +30,21 @@ public class UserLoginUseCaseTests
         new LoginRequestValidator(),
         _passwordHasher.Object);
 
-    private static User CreateUser() => new(
-        new UserId(Guid.NewGuid()),
-        "Brian Gomez",
-        Email.Create("brian@caudal.com"),
-        "hashed-password",
-        new SaltCode("abc123"),
-        DateTime.UtcNow);
+    private static User CreateUser(bool confirmed = true)
+    {
+        var user = new User(
+            new UserId(Guid.NewGuid()),
+            "Brian Gomez",
+            Email.Create("brian@caudal.com"),
+            "hashed-password",
+            new SaltCode("abc123"),
+            DateTime.UtcNow);
+
+        if (confirmed)
+            user.UpdateEmailVerifiedAt(DateTime.UtcNow);
+
+        return user;
+    }
 
     private User UserExists(User? user = null, bool passwordMatches = true)
     {
@@ -154,6 +162,33 @@ public class UserLoginUseCaseTests
         // Assert
         Assert.Equal("SECURITY-0016", result.FirstError.Code);
         VerifyNoSession();
+    }
+
+    [Fact]
+    public async Task LoginAsync_WithUnconfirmedEmailAndCorrectPassword_AsksToConfirm()
+    {
+        // Arrange
+        UserExists(CreateUser(confirmed: false));
+
+        // Act
+        var result = await CreateUseCase().LoginAsync(ValidRequest, CancellationToken.None);
+
+        // Assert
+        Assert.Equal("SECURITY-0018", result.FirstError.Code);
+        VerifyNoSession();
+    }
+
+    [Fact]
+    public async Task LoginAsync_WithUnconfirmedEmailAndWrongPassword_DoesNotRevealIt()
+    {
+        // Arrange
+        UserExists(CreateUser(confirmed: false), passwordMatches: false);
+
+        // Act
+        var result = await CreateUseCase().LoginAsync(ValidRequest, CancellationToken.None);
+
+        // Assert
+        Assert.Equal("SECURITY-0015", result.FirstError.Code);
     }
 
     [Fact]

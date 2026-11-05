@@ -10,6 +10,8 @@ namespace Caudal.BlazorApp.Modules.Account.Login;
 /// </summary>
 public sealed class LoginFacade(IServiceScopeFactory scopes)
 {
+    public const string ConfirmationRequiredMessage = "Confirma tu correo para poder entrar. Revisa tu bandeja de entrada y el spam.";
+
     private const string DefaultTarget = "/";
 
     private static readonly Dictionary<string, string> MessagesByCode = new()
@@ -19,6 +21,7 @@ public sealed class LoginFacade(IServiceScopeFactory scopes)
         // También cubre el bloqueo temporal: decirlo aparte revelaría qué correos existen.
         ["SECURITY-0015"] = "Correo o contraseña incorrectos. Tras varios intentos fallidos, la cuenta se bloquea 15 minutos.",
         ["SECURITY-0016"] = "Tu cuenta no está disponible. Contacta a soporte.",
+        ["SECURITY-0018"] = ConfirmationRequiredMessage,
     };
 
     /// <returns>El mensaje de error, o null si la sesión quedó iniciada.</returns>

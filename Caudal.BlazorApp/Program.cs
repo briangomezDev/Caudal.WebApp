@@ -1,7 +1,9 @@
 using Caudal.Application;
+using Caudal.Application.Services.AppUser.Confirmation;
 using Caudal.BlazorApp;
 using Caudal.BlazorApp.Modules.Account;
 using Caudal.BlazorApp.Modules.Account.Session;
+using Caudal.Infraestructure.Mailing;
 using Caudal.Infraestructure.PostgreSQL;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -12,6 +14,11 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddPostgreSQL();
 builder.Services.AddApplication(options => options.UsePostgreSQL(builder.Configuration));
+builder.Services.AddEmail(builder.Configuration);
+builder.Services.AddOptions<AccountLinkOptions>()
+    .Bind(builder.Configuration.GetSection("App"))
+    .Validate(options => Uri.IsWellFormedUriString(options.BaseUrl, UriKind.Absolute), "App:BaseUrl must be an absolute URL")
+    .ValidateOnStart();
 builder.Services.AddAccountModule();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

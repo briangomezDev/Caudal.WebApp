@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\Caudal.Application\Caudal.Application.csproj" />
     <ProjectReference Include="..\Caudal.Infraestructure.PostgreSQL\Caudal.Infraestructure.PostgreSQL.csproj" />
+    <ProjectReference Include="..\Caudal.Infraestructure.Mailing\Caudal.Infraestructure.Mailing.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -10,6 +11,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <UserSecretsId>c52d77fd-6ec7-4be0-8ea3-9169e4bdae30</UserSecretsId>
   </PropertyGroup>
 
 </Project>

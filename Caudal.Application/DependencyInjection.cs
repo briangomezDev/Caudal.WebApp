@@ -1,3 +1,4 @@
+using Caudal.Application.Services.AppUser.Confirmation;
 using Caudal.Application.Services.AppUser.CreateAccount;
 using Caudal.Application.Services.AppUser.Login;
 using Caudal.Application.Services.AppUser.Logout;
@@ -19,6 +20,8 @@ public static class DependencyInjection
     {
         service.AddValidators();
         service.AddInfrastructure(configureDatabase);
+        service.AddScoped<AccountConfirmationSender>();
+        service.AddScoped<IUserConfirmationUseCase, UserConfirmationUseCase>();
         service.AddScoped<IUserCreateAccountUseCase, UserCreateAccountUseCase>();
         service.AddScoped<IUserLoginUseCase, UserLoginUseCase>();
         service.AddScoped<IUserSessionValidationUseCase, UserSessionValidationUseCase>();

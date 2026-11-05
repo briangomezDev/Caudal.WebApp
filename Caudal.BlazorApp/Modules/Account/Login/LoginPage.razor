@@ -13,9 +13,19 @@
 <p class="subtitle is-6 mb-5">Entra para ver tu resumen del mes.</p>
 @if (error is not null)
 {
-    <div class="notification is-danger is-light" role="alert">@error</div>
+    <div class="notification is-danger is-light" role="alert">
+        @error
+        @if (error == LoginFacade.ConfirmationRequiredMessage)
+        {
+            <a href="/account/resend-confirmation" class="has-text-weight-semibold ml-1">Pedir otro enlace</a>
+        }
+    </div>
 }
-else if (Reason == LoginRateLimit.ThrottledReason)
+else if (Reason == "confirmed")
+{
+    <div class="notification is-success is-light" role="status">Tu correo está confirmado. Ya puedes iniciar sesión.</div>
+}
+else if (Reason == AccountRateLimit.ThrottledReason)
 {
     <div class="notification is-warning is-light" role="alert">Demasiados intentos. Espera un minuto antes de volver a intentarlo.</div>
 }

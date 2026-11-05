@@ -78,6 +78,9 @@ internal sealed class UserLoginUseCase : IUserLoginUseCase
             if (!user.IsEnabled)
                 return Error.Forbidden("SECURITY-0016", "The account is not available");
 
+            if (!user.IsEmailConfirmed)
+                return Error.Forbidden("SECURITY-0018", "The email has not been confirmed");
+
             user.ResetFailedLogins();
 
             var duration = request.RememberMe ? RememberedSessionDuration : SessionDuration;

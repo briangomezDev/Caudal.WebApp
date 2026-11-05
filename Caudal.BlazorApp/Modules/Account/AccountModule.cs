@@ -1,3 +1,4 @@
+using Caudal.BlazorApp.Modules.Account.Confirmation;
 using Caudal.BlazorApp.Modules.Account.Login;
 using Caudal.BlazorApp.Modules.Account.Register;
 using Caudal.BlazorApp.Modules.Account.Session;
@@ -10,12 +11,13 @@ public static class AccountModule
     public static IServiceCollection AddAccountModule(this IServiceCollection services)
     {
         services.AddScoped<RegisterFacade>();
+        services.AddScoped<ConfirmationFacade>();
         services.AddScoped<LoginFacade>();
         services.AddScoped<SessionFacade>();
         services.AddScoped<SessionCookieEvents>();
         services.AddCascadingAuthenticationState();
         services.AddScoped<AuthenticationStateProvider, SessionRevalidationProvider>();
-        services.AddLoginRateLimit();
+        services.AddAccountRateLimit();
         return services;
     }
 }

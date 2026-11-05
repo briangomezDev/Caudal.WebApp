@@ -20,6 +20,14 @@ internal class UserRepository : IUserRepository
         await _dbcontext.Users.AddAsync(user, cancellationToken);
     }
 
+    public void RemoveUser(User user)
+    {
+        if (_dbcontext.Users is null)
+            throw new ArgumentNullException(nameof(_dbcontext.Users));
+
+        _dbcontext.Users.Remove(user);
+    }
+
     public async Task<bool> ExistsByEmailAsync(Email? email, CancellationToken cancellationToken)
     {
         if (_dbcontext.Users is null)

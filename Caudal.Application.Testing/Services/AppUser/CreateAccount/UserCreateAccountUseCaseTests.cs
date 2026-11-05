@@ -1,3 +1,4 @@
+using Caudal.Application.Services.AppUser.Confirmation;
 using Caudal.Application.Services.AppUser.CreateAccount;
 using Caudal.Domain.Security.Adapter;
 using Caudal.Domain.Security.Entity;
@@ -10,6 +11,7 @@ using ErrorOr;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -22,12 +24,102 @@ public class UserCreateAccountUseCaseTests
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
     private readonly Mock<IUserRepository> _repository = new();
     private readonly Mock<IPasswordHasher> _passwordHasher = new();
+    private readonly Mock<IAccountConfirmationTokens> _tokens = new();
+    private readonly Mock<IAccountNotifier> _notifier = new();
 
     public UserCreateAccountUseCaseTests()
     {
         _passwordHasher
             .Setup(h => h.Hash(It.IsAny<string>()))
             .Returns(("hashed-password", new SaltCode("abc123")));
+        _tokens
+            .Setup(t => t.Create(It.IsAny<UserId>(), It.IsAny<Email>()))
+            .Returns("signed+token");
+    }
+
+    private static User CreateExistingUser(DateTime? createdAt = null, bool confirmed = false)
+    {
+        var user = new User(
+            new UserId(Guid.NewGuid()),
+            "Otra Persona",
+            Email.Create("brian@caudal.com"),
+            "other-hash",
+            new SaltCode("xyz789"),
+            createdAt ?? DateTime.UtcNow);
+
+        if (confirmed)
+            user.UpdateEmailVerifiedAt(DateTime.UtcNow);
+
+        return user;
+    }
+
+    // Confirmación: el registro envía el enlace, sin que un fallo de envío pierda la cuenta.
+
+    [Fact]
+    public async Task CreateAccountAsync_WithValidRequest_SendsConfirmationLink()
+    {
+        // Act
+        await CreateUseCase().CreateAccountAsync(ValidRequest, CancellationToken.None);
+
+        // Assert
+        _notifier.Verify(n => n.SendConfirmationAsync(
+            It.Is<AccountRecipient>(r => r.FullName == "Brian Gomez" && r.Email == "brian@caudal.com"),
+            "https://caudal.test/account/confirm?token=signed%2Btoken",
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task CreateAccountAsync_WhenSendingFails_StillCreatesTheAccount()
+    {
+        // Arrange
+        _notifier
+            .Setup(n => n.SendConfirmationAsync(It.IsAny<AccountRecipient>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("smtp down"));
+
+        // Act
+        var result = await CreateUseCase().CreateAccountAsync(ValidRequest, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsError);
+        _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task CreateAccountAsync_WhenUnconfirmedAccountExpired_ReplacesIt()
+    {
+        // Arrange
+        var expired = CreateExistingUser(DateTime.UtcNow.AddHours(-25));
+        _repository
+            .Setup(r => r.GetByEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expired);
+
+        // Act
+        var result = await CreateUseCase().CreateAccountAsync(ValidRequest, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsError);
+        _repository.Verify(r => r.RemoveUser(expired), Times.Once);
+        _repository.Verify(r => r.AddUserAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Theory]
+    [InlineData(false, 1)]
+    [InlineData(true, 100)]
+    public async Task CreateAccountAsync_WhenAccountStillValid_ReturnsConflictAndKeepsIt(bool confirmed, int hoursOld)
+    {
+        // Arrange
+        var existing = CreateExistingUser(DateTime.UtcNow.AddHours(-hoursOld), confirmed);
+        _repository
+            .Setup(r => r.GetByEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existing);
+
+        // Act
+        var result = await CreateUseCase().CreateAccountAsync(ValidRequest, CancellationToken.None);
+
+        // Assert
+        Assert.Equal("SECURITY-0012", result.FirstError.Code);
+        _repository.Verify(r => r.RemoveUser(It.IsAny<User>()), Times.Never);
+        VerifyNothingWasSaved();
     }
 
     private UserCreateAccountUseCase CreateUseCase(IValidator<UserRequest>? validator = null)
@@ -37,7 +129,12 @@ public class UserCreateAccountUseCaseTests
             _unitOfWork.Object,
             _repository.Object,
             validator ?? new UserRequestValidator(),
-            _passwordHasher.Object);
+            _passwordHasher.Object,
+            new AccountConfirmationSender(
+                NullLogger<AccountConfirmationSender>.Instance,
+                _tokens.Object,
+                _notifier.Object,
+                Options.Create(new AccountLinkOptions { BaseUrl = "https://caudal.test/" })));
     }
 
     private void VerifyNothingWasSaved()
@@ -99,7 +196,7 @@ public class UserCreateAccountUseCaseTests
         await useCase.CreateAccountAsync(ValidRequest, cancellation.Token);
 
         // Assert
-        _repository.Verify(r => r.ExistsByEmailAsync(It.IsAny<Email>(), cancellation.Token), Times.Once);
+        _repository.Verify(r => r.GetByEmailAsync(It.IsAny<Email>(), cancellation.Token), Times.Once);
         _repository.Verify(r => r.AddUserAsync(It.IsAny<User>(), cancellation.Token), Times.Once);
         _unitOfWork.Verify(u => u.SaveChangesAsync(cancellation.Token), Times.Once);
     }
@@ -122,7 +219,7 @@ public class UserCreateAccountUseCaseTests
         Assert.Equal(
             ["SECURITY-0001", "SECURITY-0005", "SECURITY-0007"],
             result.Errors.Select(error => error.Code));
-        _repository.Verify(r => r.ExistsByEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>()), Times.Never);
+        _repository.Verify(r => r.GetByEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>()), Times.Never);
         _passwordHasher.Verify(h => h.Hash(It.IsAny<string>()), Times.Never);
         VerifyNothingWasSaved();
     }
@@ -132,8 +229,8 @@ public class UserCreateAccountUseCaseTests
     {
         // Arrange
         _repository
-            .Setup(r => r.ExistsByEmailAsync(Email.Create("brian@caudal.com"), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+            .Setup(r => r.GetByEmailAsync(Email.Create("brian@caudal.com"), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateExistingUser());
         var useCase = CreateUseCase();
 
         // Act
@@ -210,6 +307,7 @@ public class UserCreateAccountUseCaseTests
     [InlineData("repository")]
     [InlineData("validator")]
     [InlineData("passwordHasher")]
+    [InlineData("confirmationSender")]
     public void Constructor_WithNullDependency_ThrowsException(string parameter)
     {
         // Arrange
@@ -218,9 +316,14 @@ public class UserCreateAccountUseCaseTests
         var repository = parameter == "repository" ? null! : _repository.Object;
         IValidator<UserRequest> validator = parameter == "validator" ? null! : new UserRequestValidator();
         var passwordHasher = parameter == "passwordHasher" ? null! : _passwordHasher.Object;
+        var confirmationSender = parameter == "confirmationSender" ? null! : new AccountConfirmationSender(
+            NullLogger<AccountConfirmationSender>.Instance,
+            _tokens.Object,
+            _notifier.Object,
+            Options.Create(new AccountLinkOptions { BaseUrl = "https://caudal.test/" }));
 
         // Act
-        var act = () => new UserCreateAccountUseCase(logger, unitOfWork, repository, validator, passwordHasher);
+        var act = () => new UserCreateAccountUseCase(logger, unitOfWork, repository, validator, passwordHasher, confirmationSender);
 
         // Assert
         var exception = Assert.Throws<ArgumentNullException>(act);
@@ -254,7 +357,7 @@ public class UserCreateAccountUseCaseTests
     {
         // Arrange
         _repository
-            .Setup(r => r.ExistsByEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetByEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new TimeoutException("Database timeout."));
         var useCase = CreateUseCase();
 

@@ -9,6 +9,7 @@ public class User : IAgregateRoot
 {
     public const short MaxFailedLogins = 5;
     public static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
+    public static readonly TimeSpan ConfirmationWindow = TimeSpan.FromHours(24);
 
     public UserId? UserId { get; private set; }
     public string? FullName { get; private set; }
@@ -38,6 +39,13 @@ public class User : IAgregateRoot
     }
 
     public bool IsEnabled => Status == UserStatus.Active;
+
+    public bool IsEmailConfirmed => EmailVerifiedAt is not null;
+
+    /// <summary>
+    /// Venció el plazo sin confirmar: el correo queda libre para que su dueño real se registre.
+    /// </summary>
+    public bool HasConfirmationExpired(DateTime now) => !IsEmailConfirmed && AccountCreatedAt + ConfirmationWindow <= now;
 
     /// <summary>
     /// Bloqueo temporal por intentos fallidos: impide entrar, pero no termina las sesiones abiertas,

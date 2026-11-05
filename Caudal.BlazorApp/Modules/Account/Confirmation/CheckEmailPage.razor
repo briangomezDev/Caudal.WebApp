@@ -1,0 +1,14 @@
+@page "/account/check-email"
+@layout AuthLayout
+
+<PageTitle>Revisa tu correo · Caudal</PageTitle>
+
+<BrandPanel Variant="BrandVariant.Register"
+            Title="Solo falta confirmar que el correo es tuyo."
+            Lead="Así protegemos tu cuenta y sabemos a dónde escribirte si necesitas recuperarla." />
+
+<div class="icon-circle"><svg class="ic"><use href="#i-mail" /></svg></div>
+<h2 class="title is-4 mb-1">Revisa tu correo</h2>
+<p class="subtitle is-6 mb-5">Te enviamos un enlace para confirmar tu cuenta. Vence en 24 horas.</p>
+<a class="button is-primary is-medium is-fullwidth" href="/account/login">Ir a iniciar sesión</a>
+<p class="has-text-centered is-size-7 mt-4 muted">¿No llegó? Revisa spam o <a href="/account/resend-confirmation" class="has-text-weight-semibold">pide otro enlace</a></p>
