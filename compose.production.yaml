@@ -1,0 +1,22 @@
+# La app con su configuración de producción. Valores en .env.production (ver .env.production.example).
+# Levántala con: docker compose -f compose.production.yaml up -d --build
+name: caudal-production
+
+services:
+  app:
+    build: .
+    env_file: .env.production
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: https://+:8443
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /certs/caudal.pfx
+    ports:
+      - "127.0.0.1:7443:8443"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./.certs:/certs:ro
+      - data-protection:/home/app/.aspnet/DataProtection-Keys
+
+volumes:
+  data-protection:

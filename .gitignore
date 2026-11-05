@@ -70,3 +70,7 @@ node_modules/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Producción local con Docker
+!.env.production.example
+.certs/

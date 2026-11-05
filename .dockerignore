@@ -1,0 +1,11 @@
+**/bin
+**/obj
+.git
+.vscode
+doc
+*.Testing
+
+# La configuración llega por variables de entorno: nada de esto debe quedar dentro de la imagen.
+**/appsettings*.json
+.env*
+.certs
