@@ -33,6 +33,11 @@ public class User : IAgregateRoot
         Status = UserStatus.Active;
     }
 
+    public bool CanLogin(DateTime now)
+    {
+        return Status == UserStatus.Active && (AccountLockedUntil is null || AccountLockedUntil <= now);
+    }
+
     public void UpdateEmailVerifiedAt(DateTime emailVerifiedAt)
     {
         if (emailVerifiedAt.Kind != DateTimeKind.Utc)

@@ -1,6 +1,8 @@
 using Caudal.Domain.Security.Session.Adapter;
 using Caudal.Domain.Security.Session.Entity;
+using Caudal.Domain.Security.Session.ValueObjects;
 using Caudal.Domain.Security.ValueObjects;
+using Microsoft.EntityFrameworkCore;
 
 namespace Caudal.Infraestructure.Port.Security;
 
@@ -10,6 +12,20 @@ internal sealed class UserSessionRepository : IUserSessionRepository
     public UserSessionRepository(IApplicationDbContext dbContext)
     {
         _dbcontext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+    }
+    public async Task AddAsync(UserSession session, CancellationToken cancellationToken)
+    {
+        if (_dbcontext.UserSessions is null)
+            throw new ArgumentNullException(nameof(_dbcontext.UserSessions));
+
+        await _dbcontext.UserSessions.AddAsync(session, cancellationToken);
+    }
+    public async Task<UserSession?> GetByIdAsync(SessionId sessionId, CancellationToken cancellationToken)
+    {
+        if (_dbcontext.UserSessions is null)
+            throw new ArgumentNullException(nameof(_dbcontext.UserSessions));
+
+        return await _dbcontext.UserSessions.FirstOrDefaultAsync(x => x.SessionId == sessionId, cancellationToken);
     }
     public async Task<UserSession?> GetByUserIdAsync(UserId userId)
     {

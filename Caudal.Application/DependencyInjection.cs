@@ -1,4 +1,7 @@
 using Caudal.Application.Services.AppUser.CreateAccount;
+using Caudal.Application.Services.AppUser.Login;
+using Caudal.Application.Services.AppUser.Logout;
+using Caudal.Application.Services.AppUser.ValidateSession;
 using Caudal.Infraestructure;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -17,12 +20,16 @@ public static class DependencyInjection
         service.AddValidators();
         service.AddInfrastructure(configureDatabase);
         service.AddScoped<IUserCreateAccountUseCase, UserCreateAccountUseCase>();
+        service.AddScoped<IUserLoginUseCase, UserLoginUseCase>();
+        service.AddScoped<IUserSessionValidationUseCase, UserSessionValidationUseCase>();
+        service.AddScoped<IUserLogoutUseCase, UserLogoutUseCase>();
         return service;
     }
 
     private static IServiceCollection AddValidators(this IServiceCollection services)
     {
         services.AddScoped<IValidator<UserRequest>, UserRequestValidator>();
+        services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
         return services;
     }
 }

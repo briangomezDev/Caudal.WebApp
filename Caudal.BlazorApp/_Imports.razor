@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Sections
@@ -5,3 +6,5 @@
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using Microsoft.JSInterop
 @using Caudal.BlazorApp.Shared
+@* Segura por defecto: toda página exige sesión. Las públicas declaran [AllowAnonymous] en el _Imports de su módulo. *@
+@attribute [Authorize]

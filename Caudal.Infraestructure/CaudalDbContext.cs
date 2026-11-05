@@ -1,4 +1,5 @@
 using Caudal.Domain.Security.Entity;
+using Caudal.Domain.Security.Session.Entity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Caudal.Infraestructure;
@@ -8,6 +9,7 @@ internal sealed class CaudalDbContext : DbContext, IApplicationDbContext
     private readonly IDatabaseProvider _databaseProvider;
 
     public DbSet<User>? Users { get; set; }
+    public DbSet<UserSession>? UserSessions { get; set; }
 
     public CaudalDbContext(DbContextOptions<CaudalDbContext> options, IDatabaseProvider databaseProvider) : base(options)
     {

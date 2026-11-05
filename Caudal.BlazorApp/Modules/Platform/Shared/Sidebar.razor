@@ -23,6 +23,9 @@
     <div class="side-foot">
         <span class="avatar"><svg class="ic"><use href="#i-user" /></svg></span>
         <span class="side-user">Tu cuenta</span>
-        <a class="side-logout ml-auto" href="/account/login" aria-label="Cerrar sesión"><svg class="ic"><use href="#i-logout" /></svg></a>
+        <form class="ml-auto" method="post" action="/account/logout">
+            <AntiforgeryToken />
+            <button class="side-logout" type="submit" aria-label="Cerrar sesión"><svg class="ic"><use href="#i-logout" /></svg></button>
+        </form>
     </div>
 </aside>

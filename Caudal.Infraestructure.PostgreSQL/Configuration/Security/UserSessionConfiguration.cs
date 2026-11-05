@@ -25,9 +25,8 @@ internal class UserSessionConfiguration : IEntityTypeConfiguration<UserSession>
             .HasConversion(id => id!.Value, value => new UserId(value))
             .IsRequired();
 
-        // La columna se llama así en la base de datos.
         builder.Property(x => x.Device)
-            .HasColumnName("devide")
+            .HasColumnName("device")
             .HasMaxLength(100)
             .IsRequired();
 

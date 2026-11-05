@@ -1,5 +1,8 @@
 @page "/account/login"
 @layout AuthLayout
+@using Caudal.BlazorApp.Modules.Account.Session
+@inject LoginFacade Facade
+@inject NavigationManager Navigation
 
 <PageTitle>Iniciar sesión · Caudal</PageTitle>
 
@@ -8,12 +11,21 @@
 
 <h2 class="title is-3 mb-1">Bienvenido de vuelta</h2>
 <p class="subtitle is-6 mb-5">Entra para ver tu resumen del mes.</p>
+@if (error is not null)
+{
+    <div class="notification is-danger is-light" role="alert">@error</div>
+}
+else if (Reason == SessionCookieEvents.ExpiredReason)
+{
+    <div class="notification is-info is-light" role="status">Tu sesión terminó. Inicia sesión de nuevo para continuar.</div>
+}
 @* Estático a propósito: un circuito interactivo no puede escribir la cookie de sesión. *@
-<PendingForm Name="login">
+<form method="post" @formname="login" @onsubmit="SubmitAsync">
+    <AntiforgeryToken />
     <div class="field">
         <label class="label" for="login-email">Correo electrónico</label>
         <div class="control has-icons-left">
-            <input class="input is-medium" id="login-email" name="Email" type="email" autocomplete="email" placeholder="tu@correo.com" required />
+            <input class="input is-medium" id="login-email" name="Form.Email" value="@Form?.Email" type="email" autocomplete="email" placeholder="tu@correo.com" required />
             <span class="icon is-left"><svg class="ic"><use href="#i-mail" /></svg></span>
         </div>
     </div>
@@ -24,19 +36,48 @@
         </div>
         <div class="field has-addons mb-0">
             <div class="control has-icons-left is-expanded">
-                <input class="input is-medium" id="login-pass" name="Password" type="password" autocomplete="current-password" placeholder="••••••••" required />
+                <input class="input is-medium" id="login-pass" name="Form.Password" type="password" autocomplete="current-password" placeholder="••••••••" required />
                 <span class="icon is-left"><svg class="ic"><use href="#i-lock" /></svg></span>
             </div>
             <div class="control"><button type="button" class="button is-medium" data-toggle-pass="login-pass" aria-label="Mostrar contraseña"><svg class="ic"><use href="#i-eye" /></svg></button></div>
         </div>
     </div>
     <div class="field">
-        <label class="checkbox is-size-7"><input type="checkbox" id="login-remember" name="RememberMe" value="true" checked /> Mantener la sesión en este dispositivo</label>
+        <label class="checkbox is-size-7"><input type="checkbox" id="login-remember" name="Form.RememberMe" value="true" checked="@Form?.RememberMe" /> Mantener la sesión en este dispositivo</label>
     </div>
     <button class="button is-primary is-medium is-fullwidth mt-4" type="submit">Iniciar sesión</button>
-</PendingForm>
+</form>
 <div class="divider-or">o continúa con</div>
 <div class="buttons is-centered">
     <button class="button is-fullwidth" type="button"><span class="google-mark has-text-weight-bold mr-2">G</span>Google</button>
 </div>
 <p class="has-text-centered is-size-7 mt-4 muted">¿Aún no tienes cuenta? <a href="/account/register" class="has-text-weight-semibold">Crea una gratis</a></p>
+
+@code {
+    private string? error;
+
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm(FormName = "login")] private LoginForm? Form { get; set; }
+
+    [SupplyParameterFromQuery] private string? ReturnUrl { get; set; }
+
+    [SupplyParameterFromQuery] private string? Reason { get; set; }
+
+    protected override void OnInitialized()
+    {
+        // Sin formulario enviado: primera carga, con la casilla marcada como en el diseño.
+        Form ??= new LoginForm { RememberMe = true };
+
+        if (HttpMethods.IsGet(HttpContext.Request.Method) && HttpContext.User.Identity?.IsAuthenticated == true)
+            Navigation.NavigateTo(LoginFacade.RedirectTarget(ReturnUrl));
+    }
+
+    private async Task SubmitAsync()
+    {
+        error = await Facade.LoginAsync(Form!, HttpContext);
+
+        if (error is null)
+            Navigation.NavigateTo(LoginFacade.RedirectTarget(ReturnUrl));
+    }
+}

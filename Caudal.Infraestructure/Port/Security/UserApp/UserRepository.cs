@@ -28,6 +28,14 @@ internal class UserRepository : IUserRepository
         return await _dbcontext.Users.AnyAsync(x => x.Email == email, cancellationToken);
     }
 
+    public async Task<User?> GetByIdAsync(UserId userId, CancellationToken cancellationToken)
+    {
+        if (_dbcontext.Users is null)
+            throw new ArgumentNullException(nameof(_dbcontext.Users));
+
+        return await _dbcontext.Users.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
+    }
+
     public async Task<User?> GetByEmailAsync(Email? email, CancellationToken cancellationToken)
     {
         if (_dbcontext.Users is null)

@@ -1,5 +1,6 @@
 using Caudal.Domain.Security.Adapter;
 using Caudal.Domain.Security.Service;
+using Caudal.Domain.Security.Session.Adapter;
 using Caudal.Infraestructure.Port.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +32,7 @@ public static class DependencyInjection
     private static IServiceCollection AddPorts(this IServiceCollection services)
     {
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         services.AddScoped<ISaltCodeGenerator, CryptographySaltCodeGenerator>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         return services;

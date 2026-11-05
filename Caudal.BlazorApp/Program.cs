@@ -1,6 +1,7 @@
 using Caudal.Application;
 using Caudal.BlazorApp;
 using Caudal.BlazorApp.Modules.Account;
+using Caudal.BlazorApp.Modules.Account.Session;
 using Caudal.Infraestructure.PostgreSQL;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -21,8 +22,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     option.Cookie.HttpOnly = true;
     option.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     option.Cookie.SameSite = SameSiteMode.Lax;
-    option.ExpireTimeSpan = TimeSpan.FromHours(8);
-    option.SlidingExpiration = true;
+    // La expiración la decide la fila de app_user_session: la cookie la copia al crearse y al renovarse.
+    option.SlidingExpiration = false;
+    option.EventsType = typeof(SessionCookieEvents);
 });
 builder.Services.AddAuthorization();
 
@@ -56,6 +58,7 @@ app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+app.MapSessionEndpoints();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

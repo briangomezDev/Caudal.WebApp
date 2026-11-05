@@ -34,9 +34,9 @@ public class UserSessionConfigurationTests
     [Theory]
     [InlineData(nameof(UserSession.SessionId), "id", false)]
     [InlineData(nameof(UserSession.UserId), "user_id", false)]
-    [InlineData(nameof(UserSession.Device), "devide", false)]
+    [InlineData(nameof(UserSession.Device), "device", false)]
     [InlineData(nameof(UserSession.CreatedAt), "created_at", false)]
-    [InlineData(nameof(UserSession.LastActivityAt), "last_activity_at", false)]
+    [InlineData(nameof(UserSession.LastActivityAt), "last_activity_at", true)]
     [InlineData(nameof(UserSession.ExpiresAt), "expires_at", false)]
     public void Model_MapsPropertyToColumn(string propertyName, string expectedColumn, bool expectedNullable)
     {
